@@ -1,0 +1,21 @@
+{
+  "short_name": "MoonComp",
+  "name": "Moon Compass App",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/00ffcc/ffffff?text=Moon",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://via.placeholder.com/512/00ffcc/ffffff?text=Moon",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#0c0f12",
+  "theme_color": "#0c0f12",
+  "display": "standalone",
+  "orientation": "portrait"
+}
