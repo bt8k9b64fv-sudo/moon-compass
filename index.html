@@ -7,7 +7,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>MOON COMPASS</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="https://via.placeholder.com/192/000000/ffffff?text=MOON">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
 
@@ -17,55 +16,62 @@
       --accent-color: #ffffff;
       --moon-color: #f9d71c;
       --north-color: #ff3b30;
+      --gray-text: #8e8e93;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    /* iPhone 16 Proの縦長画面とDynamic Island（上部セーフエリア）に最適化 */
     body {
       background-color: var(--bg-color);
       color: var(--accent-color);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
       margin: 0;
-      padding: 70px 20px 30px 20px; /* 上部パディングを広げてDynamic Islandを回避 */
+      padding: 60px 20px 40px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start; /* 全体を上詰めに変更 */
+      justify-content: flex-start;
       height: 100vh;
       overflow: hidden;
     }
 
-    /* 1. 最上部：メインビジュアルエリア（コンパス） */
+    /* メインビジュアルエリア */
     .main-visual-area {
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
       width: 100%;
-      height: 280px;
-      margin-bottom: 20px; /* 上に詰めるため程よい隙間に調整 */
+      height: 320px;
+      margin-bottom: 20px;
     }
 
     /* コンパス外枠 */
     .compass-viewport {
       position: relative;
-      width: 280px;
-      height: 280px;
+      width: 300px;
+      height: 300px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* 固定されたセンターライン（上部の赤い三角） */
+    /* 中央の薄い十字線（純正風） */
+    .crosshair-h, .crosshair-v {
+      position: absolute;
+      background: rgba(255,255,255,0.15);
+      z-index: 5;
+    }
+    .crosshair-h { width: 120px; height: 1px; }
+    .crosshair-v { width: 1px; height: 120px; }
+
+    /* 中央のインジケーター（固定の白い縦線） */
     .center-pointer {
       position: absolute;
-      top: -8px;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 12px solid var(--north-color);
+      top: -10px;
+      width: 2px;
+      height: 35px;
+      background-color: var(--accent-color);
       z-index: 10;
     }
 
@@ -75,8 +81,7 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 1px solid #222;
-      transition: transform 0.1s linear;
+      /* CSS transitionを削除し、JSで滑らかに動かす */
     }
 
     /* 目盛り */
@@ -84,24 +89,33 @@
       position: absolute;
       width: 1.5px;
       height: 8px;
-      background: #444;
+      background: #555;
       left: 50%;
-      transform-origin: 0 140px;
+      transform-origin: 0 150px;
     }
-    .tick.major { height: 16px; background: #bbb; }
-    .tick.north { background: var(--north-color); width: 2.5px; }
+    .tick.major { height: 16px; background: #eee; }
+    .tick.north { 
+      background: var(--north-color); 
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 10px solid var(--north-color);
+      top: 5px; left: calc(50% - 6px);
+      transform-origin: 6px 145px;
+      background: transparent;
+    }
 
     /* 方位文字 */
     .direction-label {
       position: absolute;
-      width: 30px;
-      height: 30px;
+      width: 40px;
+      height: 40px;
       text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      left: calc(50% - 15px);
-      top: 20px;
-      transform-origin: 15px 120px;
+      font-weight: 400;
+      font-size: 20px;
+      left: calc(50% - 20px);
+      top: 25px;
+      transform-origin: 20px 125px;
     }
 
     /* 月のマーカー */
@@ -115,96 +129,102 @@
       justify-content: center;
       left: calc(50% - 15px);
       top: 5px;
-      transform-origin: 15px 135px;
+      transform-origin: 15px 145px;
       z-index: 20;
     }
 
-    /* 高度メーター：絶対配置に変更し、画面右端（パディングの内側すぐ）へ移動 */
+    /* 高度メーター（右端に細く配置） */
     .altitude-meter {
       position: absolute;
       right: 0;
-      height: 200px;
-      width: 34px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 17px;
+      height: 220px;
+      width: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
       display: flex;
       flex-direction: column-reverse;
-      align-items: center;
-      padding: 8px 0;
-      border: 1px solid #222;
     }
     .alt-bar-fill {
-      width: 6px;
+      width: 100%;
       background: var(--moon-color);
-      border-radius: 3px;
+      border-radius: 2px;
       transition: height 0.3s ease;
-      box-shadow: 0 0 10px var(--moon-color);
-    }
-    .alt-label {
-      position: absolute;
-      bottom: -24px;
-      font-size: 9px;
-      color: #666;
-      white-space: nowrap;
-      letter-spacing: 0.5px;
+      box-shadow: 0 0 8px rgba(249, 215, 28, 0.5);
     }
 
-    /* 2. 中央：現在の方位角表示エリア（コンパスの真下に配置） */
+    /* 中央：方位角表示（純正の極細フォント風） */
     .heading-display {
       text-align: center;
       width: 100%;
-      margin-bottom: 30px; /* 下部データとのバランスをとる余白 */
-    }
-    .heading-value { font-size: 56px; font-weight: 200; }
-    .heading-unit { font-size: 20px; color: #888; margin-left: 2px; }
-    .heading-direction { font-size: 22px; display: block; margin-top: -5px; }
-
-    /* 3. 下部：日本語データ（絶対に重ならない独立エリア） */
-    .data-table {
-      width: 100%;
-      max-width: 340px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      font-size: 14px;
-    }
-    .data-item { display: flex; flex-direction: column; }
-    .data-label { color: #666; font-size: 11px; margin-bottom: 2px; }
-    .data-value { font-weight: 500; font-size: 15px; color: #eee; }
-
-    /* 開始ボタン（オーバーレイ） */
-    .start-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-color);
-      z-index: 100;
+      margin-bottom: 20px;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      align-items: baseline;
       justify-content: center;
     }
+    .heading-value { 
+      font-size: 80px; 
+      font-weight: 200; /* 極細フォント */
+      letter-spacing: -2px;
+    }
+    .heading-unit { 
+      font-size: 40px; 
+      font-weight: 200;
+      margin-left: 2px;
+    }
+    .heading-direction { 
+      font-size: 40px; 
+      font-weight: 300;
+      margin-left: 10px;
+    }
+
+    /* 下部：データ表示（枠線を消し、プレーンテキスト化） */
+    .data-text-area {
+      text-align: center;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .data-line {
+      font-size: 15px;
+      font-weight: 400;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+    .data-line-sub {
+      font-size: 13px;
+      color: var(--gray-text);
+    }
+
+    /* 許可ボタン画面 */
+    .start-overlay {
+      position: fixed; inset: 0; background: var(--bg-color);
+      z-index: 100; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
     .btn {
-      background: #fff; color: #000; border: none; padding: 18px 40px;
-      border-radius: 30px; font-size: 18px; font-weight: bold;
+      background: #fff; color: #000; border: none; padding: 16px 32px;
+      border-radius: 30px; font-size: 16px; font-weight: bold;
     }
   </style>
 </head>
 <body>
 
   <div class="start-overlay" id="overlay">
-    <h1 style="margin-bottom:40px; letter-spacing:4px; font-weight:300;">MOON COMPASS</h1>
-    <button class="btn" id="startBtn">計測開始</button>
+    <button class="btn" id="startBtn">コンパスを起動</button>
   </div>
 
   <div class="main-visual-area">
     <div class="compass-viewport">
+      <div class="crosshair-h"></div>
+      <div class="crosshair-v"></div>
+      
       <div class="center-pointer"></div>
+      
       <div class="compass-rose" id="rose"></div>
     </div>
-
     <div class="altitude-meter">
       <div class="alt-bar-fill" id="altFill" style="height: 0%;"></div>
-      <div class="alt-label">月の高度</div>
     </div>
   </div>
 
@@ -213,63 +233,68 @@
     <span class="heading-direction" id="bigDirection">北</span>
   </div>
 
-  <div class="data-table">
-    <div class="data-item"><span class="data-label">月の高度</span><span class="value data-value" id="moonAlt">-</span></div>
-    <div class="data-item"><span class="data-label">月の方位</span><span class="value data-value" id="moonAz">-</span></div>
-    <div class="data-item"><span class="data-label">現在地（緯度）</span><span class="value data-value" id="valLat">-</span></div>
-    <div class="data-item"><span class="data-label">現在地（経度）</span><span class="value data-value" id="valLon">-</span></div>
-    <div class="data-item"><span class="data-label">高度</span><span class="value data-value" id="valHeight">-</span></div>
-    <div class="data-item"><span class="data-label">気温</span><span class="value data-value" id="valTemp">-</span></div>
-    <div class="data-item"><span class="data-label">気圧</span><span class="value data-value" id="valPress">-</span></div>
+  <div class="data-text-area">
+    <div class="data-line" id="txtMoonData">月の高度: - ／ 方位: -</div>
+    <div class="data-line" id="txtGeoData">北緯 - 東経 -</div>
+    <div class="data-line data-line-sub" id="txtEnvData">高度 - ／ 気温 - ／ 気圧 -</div>
   </div>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(err => {});
-    }
-
     const rose = document.getElementById('rose');
     
+    // 目盛りの生成
     for (let i = 0; i < 360; i += 2) {
       const tick = document.createElement('div');
       tick.className = 'tick';
-      if (i % 10 === 0) tick.classList.add('major');
-      if (i === 0) tick.classList.add('north');
+      if (i === 0) {
+        tick.classList.add('north');
+      } else if (i % 30 === 0) {
+        tick.classList.add('major'); // 30度ごとは少し太く
+      } else if (i % 10 === 0) {
+        tick.style.height = '12px'; // 10度ごとは中くらい
+      }
       tick.style.transform = `rotate(${i}deg)`;
       rose.appendChild(tick);
     }
 
+    // 四方文字
     const dirs = { 0: '北', 90: '東', 180: '南', 270: '西' };
     for (let angle in dirs) {
       const label = document.createElement('div');
       label.className = 'direction-label';
-      if(angle == 0) label.style.color = 'var(--north-color)';
       label.innerText = dirs[angle];
       label.style.transform = `rotate(${angle}deg)`;
       rose.appendChild(label);
     }
 
+    // 月マーカー
     const moonMarker = document.createElement('div');
     moonMarker.className = 'moon-marker';
     moonMarker.innerHTML = '🌕';
     rose.appendChild(moonMarker);
 
+    // URLパラメータ
     const urlParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(urlParams.get('lat')) || 35.6586;
-    const lon = parseFloat(urlParams.get('lon')) || 139.7454;
+    const lat = parseFloat(urlParams.get('lat')) || 35.0000;
+    const lon = parseFloat(urlParams.get('lon')) || 136.0000;
+    const heightVal = urlParams.get('height') || '0';
+    const tempVal = urlParams.get('temp') || '0';
+    const pressVal = urlParams.get('press') || '0';
 
-    document.getElementById('valLat').innerText = lat.toFixed(2);
-    document.getElementById('valLon').innerText = lon.toFixed(2);
-    document.getElementById('valHeight').innerText = (urlParams.get('height') || '0') + 'm';
-    document.getElementById('valTemp').innerText = (urlParams.get('temp') || '0') + '℃';
-    document.getElementById('valPress').innerText = (urlParams.get('press') || '0') + 'hPa';
+    // 緯度経度のテキストセット（純正風に整形）
+    document.getElementById('txtGeoData').innerText = `北緯 ${lat.toFixed(4)}°　東経 ${lon.toFixed(4)}°`;
+    document.getElementById('txtEnvData').innerText = `高度 ${heightVal}m　気温 ${tempVal}℃　気圧 ${pressVal}hPa`;
 
     function to16Direction(deg) {
       const names = ["北", "北北東", "北東", "東北東", "東", "東南東", "南東", "南南東", "南", "南南西", "南西", "西南西", "西", "西北西", "北西", "北北西"];
       return names[Math.round(deg / 22.5) % 16];
     }
 
-    function update() {
+    // 滑らかな回転のための変数（LERP用）
+    let currentHeading = 0;
+    let targetHeading = 0;
+
+    function updateMoon() {
       const now = new Date();
       const moonPos = SunCalc.getMoonPosition(now, lat, lon);
       
@@ -279,30 +304,47 @@
 
       moonMarker.style.transform = `rotate(${azDeg}deg)`;
       
-      document.getElementById('moonAlt').innerText = altDeg.toFixed(1) + '°';
-      document.getElementById('moonAz').innerText = to16Direction(azDeg) + ' (' + azDeg.toFixed(0) + '°)';
+      const moonDirStr = to16Direction(azDeg);
+      document.getElementById('txtMoonData').innerText = `月の高度 ${altDeg.toFixed(1)}° ／ 方位 ${moonDirStr} (${azDeg.toFixed(0)}°)`;
       
       const altPercent = Math.max(0, Math.min(100, (altDeg / 90) * 100));
       document.getElementById('altFill').style.height = altPercent + '%';
     }
 
+    // 方位の更新イベント（ターゲット角度をセットするだけ）
     window.addEventListener('deviceorientation', (e) => {
       if (e.webkitCompassHeading !== undefined) {
-        const heading = e.webkitCompassHeading;
+        targetHeading = e.webkitCompassHeading;
         
-        rose.style.transform = `rotate(${-heading}deg)`;
-        
-        document.getElementById('bigHeading').innerText = Math.floor(heading);
-        document.getElementById('bigDirection').innerText = to16Direction(heading);
-        
-        update();
+        // テキストは即時更新
+        document.getElementById('bigHeading').innerText = Math.floor(targetHeading);
+        document.getElementById('bigDirection').innerText = to16Direction(targetHeading);
+        updateMoon();
       }
     }, false);
+
+    // ★ LERP（線形補間）による滑らかな描画ループ
+    function renderLoop() {
+      // 最短距離の計算（359度から1度へのまたぎを滑らかにする）
+      let diff = targetHeading - currentHeading;
+      while (diff < -180) diff += 360;
+      while (diff > 180) diff -= 360;
+      
+      // 0.15 の数値を小さくするほど滑らか(遅延)に、大きくするほど機敏になります
+      currentHeading += diff * 0.15; 
+
+      // 実際の描画
+      rose.style.transform = `rotate(${-currentHeading}deg)`;
+      requestAnimationFrame(renderLoop);
+    }
+    requestAnimationFrame(renderLoop); // ループ開始
 
     document.getElementById('startBtn').onclick = () => {
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission().then(res => {
-          if (res === 'granted') document.getElementById('overlay').style.display = 'none';
+          if (res === 'granted') {
+            document.getElementById('overlay').style.display = 'none';
+          }
         });
       } else {
         document.getElementById('overlay').style.display = 'none';
