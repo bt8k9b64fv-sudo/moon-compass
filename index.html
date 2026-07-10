@@ -21,41 +21,33 @@
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    /* 画面全体のレイアウト：絶対配置を廃止し、縦に綺麗に分散並び替え */
+    /* iPhone 16 Proの縦長画面とDynamic Island（上部セーフエリア）に最適化 */
     body {
       background-color: var(--bg-color);
       color: var(--accent-color);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
       margin: 0;
-      padding: 50px 24px 30px 24px; /* 上下の余白（セーフエリアを考慮） */
+      padding: 70px 20px 30px 20px; /* 上部パディングを広げてDynamic Islandを回避 */
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between; /* 要素同士を被らないよう自動で等間隔に配置 */
+      justify-content: flex-start; /* 全体を上詰めに変更 */
       height: 100vh;
       overflow: hidden;
     }
 
-    /* 1. 現在の方位角表示エリア */
-    .heading-display {
-      text-align: center;
-      width: 100%;
-    }
-    .heading-value { font-size: 56px; font-weight: 200; }
-    .heading-unit { font-size: 20px; color: #888; margin-left: 2px; }
-    .heading-direction { font-size: 22px; display: block; margin-top: -5px; }
-
-    /* 2. メインビジュアルエリア（コンパスと高度計を横並びに固定して被りを防止） */
+    /* 1. 最上部：メインビジュアルエリア（コンパス） */
     .main-visual-area {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 24px; /* コンパスと高度計の間の隙間 */
       width: 100%;
-      max-width: 360px;
+      height: 280px;
+      margin-bottom: 20px; /* 上に詰めるため程よい隙間に調整 */
     }
 
-    /* コンパス外枠（被らないよう320pxから280pxへ最適化） */
+    /* コンパス外枠 */
     .compass-viewport {
       position: relative;
       width: 280px;
@@ -94,7 +86,7 @@
       height: 8px;
       background: #444;
       left: 50%;
-      transform-origin: 0 140px; /* 280pxの半分 */
+      transform-origin: 0 140px;
     }
     .tick.major { height: 16px; background: #bbb; }
     .tick.north { background: var(--north-color); width: 2.5px; }
@@ -127,10 +119,11 @@
       z-index: 20;
     }
 
-    /* 高度メーター（右側配置・相対位置に変更して被り防止） */
+    /* 高度メーター：絶対配置に変更し、画面右端（パディングの内側すぐ）へ移動 */
     .altitude-meter {
-      position: relative;
-      height: 180px;
+      position: absolute;
+      right: 0;
+      height: 200px;
       width: 34px;
       background: rgba(255,255,255,0.08);
       border-radius: 17px;
@@ -156,7 +149,17 @@
       letter-spacing: 0.5px;
     }
 
-    /* 3. データ表示部（日本語のみ・枠線や横棒を完全撤廃） */
+    /* 2. 中央：現在の方位角表示エリア（コンパスの真下に配置） */
+    .heading-display {
+      text-align: center;
+      width: 100%;
+      margin-bottom: 30px; /* 下部データとのバランスをとる余白 */
+    }
+    .heading-value { font-size: 56px; font-weight: 200; }
+    .heading-unit { font-size: 20px; color: #888; margin-left: 2px; }
+    .heading-direction { font-size: 22px; display: block; margin-top: -5px; }
+
+    /* 3. 下部：日本語データ（絶対に重ならない独立エリア） */
     .data-table {
       width: 100%;
       max-width: 340px;
@@ -164,7 +167,6 @@
       grid-template-columns: 1fr 1fr;
       gap: 16px;
       font-size: 14px;
-      padding-bottom: 10px;
     }
     .data-item { display: flex; flex-direction: column; }
     .data-label { color: #666; font-size: 11px; margin-bottom: 2px; }
@@ -194,11 +196,6 @@
     <button class="btn" id="startBtn">計測開始</button>
   </div>
 
-  <div class="heading-display">
-    <span class="heading-value" id="bigHeading">0</span><span class="heading-unit">°</span>
-    <span class="heading-direction" id="bigDirection">北</span>
-  </div>
-
   <div class="main-visual-area">
     <div class="compass-viewport">
       <div class="center-pointer"></div>
@@ -211,14 +208,19 @@
     </div>
   </div>
 
+  <div class="heading-display">
+    <span class="heading-value" id="bigHeading">0</span><span class="heading-unit">°</span>
+    <span class="heading-direction" id="bigDirection">北</span>
+  </div>
+
   <div class="data-table">
-    <div class="data-item"><span class="data-label">月の高度</span><span class="data-value" id="moonAlt">-</span></div>
-    <div class="data-item"><span class="data-label">月の方位</span><span class="data-value" id="moonAz">-</span></div>
-    <div class="data-item"><span class="data-label">現在地（緯度）</span><span class="data-value" id="valLat">-</span></div>
-    <div class="data-item"><span class="data-label">現在地（経度）</span><span class="data-value" id="valLon">-</span></div>
-    <div class="data-item"><span class="data-label">高度</span><span class="data-value" id="valHeight">-</span></div>
-    <div class="data-item"><span class="data-label">気温</span><span class="data-value" id="valTemp">-</span></div>
-    <div class="data-item"><span class="data-label">気圧</span><span class="data-value" id="valPress">-</span></div>
+    <div class="data-item"><span class="data-label">月の高度</span><span class="value data-value" id="moonAlt">-</span></div>
+    <div class="data-item"><span class="data-label">月の方位</span><span class="value data-value" id="moonAz">-</span></div>
+    <div class="data-item"><span class="data-label">現在地（緯度）</span><span class="value data-value" id="valLat">-</span></div>
+    <div class="data-item"><span class="data-label">現在地（経度）</span><span class="value data-value" id="valLon">-</span></div>
+    <div class="data-item"><span class="data-label">高度</span><span class="value data-value" id="valHeight">-</span></div>
+    <div class="data-item"><span class="data-label">気温</span><span class="value data-value" id="valTemp">-</span></div>
+    <div class="data-item"><span class="data-label">気圧</span><span class="value data-value" id="valPress">-</span></div>
   </div>
 
   <script>
@@ -228,7 +230,6 @@
 
     const rose = document.getElementById('rose');
     
-    // 目盛りの自動生成（280px用に調整）
     for (let i = 0; i < 360; i += 2) {
       const tick = document.createElement('div');
       tick.className = 'tick';
@@ -238,7 +239,6 @@
       rose.appendChild(tick);
     }
 
-    // 四方文字の配置
     const dirs = { 0: '北', 90: '東', 180: '南', 270: '西' };
     for (let angle in dirs) {
       const label = document.createElement('div');
@@ -249,13 +249,11 @@
       rose.appendChild(label);
     }
 
-    // 月マーカーの作成
     const moonMarker = document.createElement('div');
     moonMarker.className = 'moon-marker';
     moonMarker.innerHTML = '🌕';
     rose.appendChild(moonMarker);
 
-    // URLパラメータの解析
     const urlParams = new URLSearchParams(window.location.search);
     const lat = parseFloat(urlParams.get('lat')) || 35.6586;
     const lon = parseFloat(urlParams.get('lon')) || 139.7454;
@@ -279,14 +277,11 @@
       let azDeg = (moonPos.azimuth * (180 / Math.PI)) + 180;
       azDeg = (azDeg + 360) % 360;
 
-      // 月マーカーの角度を更新
       moonMarker.style.transform = `rotate(${azDeg}deg)`;
       
-      // テキスト表示を日本語に固定
       document.getElementById('moonAlt').innerText = altDeg.toFixed(1) + '°';
       document.getElementById('moonAz').innerText = to16Direction(azDeg) + ' (' + azDeg.toFixed(0) + '°)';
       
-      // 高度計の黄色いバーを連動 (0°〜90°を0%〜100%にマッピング)
       const altPercent = Math.max(0, Math.min(100, (altDeg / 90) * 100));
       document.getElementById('altFill').style.height = altPercent + '%';
     }
@@ -295,10 +290,8 @@
       if (e.webkitCompassHeading !== undefined) {
         const heading = e.webkitCompassHeading;
         
-        // コンパス文字盤の回転
         rose.style.transform = `rotate(${-heading}deg)`;
         
-        // 最上部の大きな数値と16方位テキストの更新
         document.getElementById('bigHeading').innerText = Math.floor(heading);
         document.getElementById('bigDirection').innerText = to16Direction(heading);
         
