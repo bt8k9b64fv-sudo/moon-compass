@@ -35,7 +35,7 @@
       overflow: hidden;
     }
 
-    /* メインエリア：被りを物理的に回避するためギャップを広げ、最大幅を制限 */
+    /* メインエリア */
     .main-visual-area {
       position: relative;
       display: flex;
@@ -45,10 +45,10 @@
       max-width: 360px;
       height: 320px;
       margin-bottom: 15px;
-      gap: 20px; /* コンパスと高度バーの間に確実な安全マージンを確保 */
+      gap: 20px;
     }
 
-    /* コンパス外枠：絶対に被らせないために直径を【260pxに縮小】。中心座標は(130px, 130px) */
+    /* コンパス外枠（直径260px、中心座標は 130px, 130px） */
     .compass-viewport {
       position: relative;
       width: 260px;
@@ -67,7 +67,7 @@
     .crosshair-h { width: 80px; height: 1px; }
     .crosshair-v { width: 1px; height: 80px; }
 
-    /* 最上部の固定された基準線 */
+    /* 最上部の固定された基準線（現在地を示す棒） */
     .center-pointer {
       position: absolute;
       top: -12px;
@@ -85,15 +85,15 @@
       border-radius: 50%;
     }
 
-    /* 目盛り：すべての長さを【16pxに完全統一】 */
+    /* 目盛り：すべての長さを16pxに完全統一 */
     .tick {
       position: absolute;
       width: 1px;
-      height: 16px; /* 16pxに固定 */
+      height: 16px;
       background: #444;
       left: 50%;
       top: 0;
-      transform-origin: 0 130px; /* 新しい半径130pxを軸に回転 */
+      transform-origin: 0 130px;
     }
     .tick.major { width: 2px; background: #bbb; }
     .tick.medium { background: #777; }
@@ -109,7 +109,7 @@
       transform-origin: 5px 128px;
     }
 
-    /* 方位文字：16pxの目盛りの内側に美しく収まる位置へ再計算 */
+    /* 方位文字 */
     .direction-label {
       position: absolute;
       width: 40px;
@@ -119,10 +119,10 @@
       font-size: 18px;
       left: calc(50% - 20px);
       top: 24px;
-      transform-origin: 20px 106px; /* 130px - 24px */
+      transform-origin: 20px 106px;
     }
 
-    /* 外周の角度数字：16pxの目盛りの外側に等間隔でマッピング */
+    /* 外周の角度数字 */
     .degree-label {
       position: absolute;
       width: 40px;
@@ -132,23 +132,22 @@
       color: var(--gray-text);
       left: calc(50% - 20px);
       top: -24px;
-      transform-origin: 20px 154px; /* 130px - (-24px) */
+      transform-origin: 20px 154px;
     }
 
-    /* 月の方位の棒：【現在方位の基準線(2px)並み、それ以上に太く力強いソリッドデザインに変更】 */
+    /* 月の方位の棒：現在地を示す基準線(.center-pointer)と全く同じ形状で「色違い」に再設計 */
     .moon-guide-line {
       position: absolute;
-      width: 2.5px; /* 現在方位と同等以上の存在感のある太さ */
-      height: 114px; /* 中心から16pxの目盛り手前までピタッと届く長さ (130 - 16) */
-      background: var(--moon-color); /* 頼りない半透明グラデーションを廃止し、力強いソリッドカラーへ */
-      opacity: 0.85;
-      left: calc(50% - 1.25px);
-      top: 16px;
-      transform-origin: 1.25px 114px;
+      width: 2px;
+      height: 32px;
+      background-color: var(--moon-color);
+      left: calc(50% - 1px);
+      top: -12px;
+      transform-origin: 1px 142px; /* 中心(130px, 130px)を軸に正確に回転 */
       z-index: 6;
     }
 
-    /* 月のマーカー */
+    /* 月のマーカー：方位棒の内側に綺麗に並ぶようマージンを再計算 */
     .moon-marker {
       position: absolute;
       width: 30px;
@@ -158,20 +157,19 @@
       align-items: center;
       justify-content: center;
       left: calc(50% - 15px);
-      top: 18px;
-      transform-origin: 15px 112px;
+      top: 26px;
+      transform-origin: 15px 104px;
       z-index: 20;
     }
 
-    /* 右側：月の高度メーターコンテナ（独立配置され、コンパスと絶対に衝突しない） */
+    /* 右側：月の高度メーターおよびUIコンテナ */
     .altitude-side-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       width: 60px;
     }
-    /* バーのすぐ上に近接配置される高度（最大小数点以下4桁） */
     .alt-live-value {
       font-size: 13px;
       font-weight: 500;
@@ -181,7 +179,7 @@
       white-space: nowrap;
     }
     .altitude-meter {
-      height: 180px;
+      height: 140px; /* スイッチを置く空間を確保するためスマートに短縮、衝突を完全回避 */
       width: 4px;
       background: rgba(255,255,255,0.15);
       border-radius: 2px;
@@ -195,7 +193,35 @@
       box-shadow: 0 0 8px rgba(249, 215, 28, 0.4);
     }
 
-    /* 中央：現在の方位角（データの質から判断し、信用に足る整数のみを表示） */
+    /* Apple純正スタイルの縦型セグメンテッドスイッチ */
+    .mode-switch {
+      display: flex;
+      flex-direction: column;
+      background: #1c1c1e;
+      border-radius: 8px;
+      padding: 2px;
+      width: 52px;
+      margin-top: 4px;
+    }
+    .sw-btn {
+      font-size: 11px;
+      padding: 5px 0;
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--gray-text);
+      font-weight: 500;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sw-btn.active {
+      background: #3a3a3c;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* 中央：現在の方位角 */
     .heading-display {
       text-align: center;
       width: 100%;
@@ -213,13 +239,13 @@
     .heading-unit { font-size: 38px; font-weight: 200; margin-left: 2px; }
     .heading-direction { font-size: 38px; font-weight: 300; margin-left: 10px; }
 
-    /* 下部：データエリア */
+    /* 下部：データエリア（文字数変動による画面のガタつきを徹底排除した独立2文章構成） */
     .data-text-area {
       text-align: center;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px;
     }
     .data-line { font-size: 14px; font-weight: 400; color: #ffffff; letter-spacing: 0.5px; }
     .data-line-sub { font-size: 12px; color: var(--gray-text); }
@@ -255,6 +281,10 @@
       <div class="altitude-meter">
         <div class="alt-bar-fill" id="altFill" style="height: 0%;"></div>
       </div>
+      <div class="mode-switch">
+        <div id="swGai" class="sw-btn active">概数</div>
+        <div id="swSei" class="sw-btn">精密</div>
+      </div>
     </div>
   </div>
 
@@ -264,7 +294,8 @@
   </div>
 
   <div class="data-text-area">
-    <div class="data-line" id="txtMoonData">月の高度: - ／ 方位: -</div>
+    <div class="data-line" id="txtMoonAlt">月の高度: -</div>
+    <div class="data-line" id="txtMoonAz">月の方位: -</div>
     <div class="data-line" id="txtGeoData">北緯 - 東経 -</div>
     <div class="data-line data-line-sub" id="txtEnvData">高度 - ／ 気温 - ／ 気圧 -</div>
   </div>
@@ -272,22 +303,22 @@
   <script>
     const rose = document.getElementById('rose');
     
-    // 1. 目盛りの自動生成（長さを16pxに完全統一。半径130pxを基準に変形）
+    // 目盛りの自動生成（長さ16px統一）
     for (let i = 0; i < 360; i += 2) {
       const tick = document.createElement('div');
       tick.className = 'tick';
       if (i === 0) {
         tick.classList.add('north');
       } else if (i % 30 === 0) {
-        tick.classList.add('major'); // 太さのみ変更
+        tick.classList.add('major');
       } else if (i % 10 === 0) {
-        tick.classList.add('medium'); // 色の強さのみ変更
+        tick.classList.add('medium');
       }
       tick.style.transform = `rotate(${i}deg)`;
       rose.appendChild(tick);
     }
 
-    // 2. 四方文字（北・東・南・西）の配置
+    // 四方文字
     const dirs = { 0: '北', 90: '東', 180: '南', 270: '西' };
     for (let angle in dirs) {
       const label = document.createElement('div');
@@ -297,7 +328,7 @@
       rose.appendChild(label);
     }
 
-    // 3. 文字盤外周への「角度数字」の配置（漢字と重なる90, 180, 270度は自動スキップ）
+    // 角度数字
     for (let i = 30; i < 360; i += 30) {
       if (i === 90 || i === 180 || i === 270) continue;
       const numLabel = document.createElement('div');
@@ -307,67 +338,86 @@
       rose.appendChild(numLabel);
     }
 
-    // 4. 月の位置を極めて正確に指し示すための太いセンターガイドライン
+    // 現在地基準線の色違いとして生成される「月の方位の棒」
     const moonLine = document.createElement('div');
     moonLine.className = 'moon-guide-line';
     rose.appendChild(moonLine);
 
-    // 月のマーカー
+    // 月マーカー
     const moonMarker = document.createElement('div');
     moonMarker.className = 'moon-marker';
     moonMarker.innerHTML = '🌕';
     rose.appendChild(moonMarker);
 
-    // URLパラメータの取得
+    // URLパラメータおよび環境データ（数値として保持）
     const urlParams = new URLSearchParams(window.location.search);
     const lat = parseFloat(urlParams.get('lat')) || 35.6586;
     const lon = parseFloat(urlParams.get('lon')) || 139.7454;
-    const heightVal = urlParams.get('height') || '0';
-    const tempVal = urlParams.get('temp') || '0';
-    const pressVal = urlParams.get('press') || '0';
+    const heightVal = parseFloat(urlParams.get('height')) || 0;
+    const tempVal = parseFloat(urlParams.get('temp')) || 0;
+    const pressVal = parseFloat(urlParams.get('press')) || 1013.25;
 
-    // スマート有効数字制御関数（指定した最大桁数に整形し、末尾の不要な0を削除）
-    function formatSmart(value, maxDecimals = 1) {
-      return parseFloat(Number(value).toFixed(maxDecimals)).toString();
+    // モード制御変数（初期値はご指示通り「概数」）
+    let displayMode = 'gaisuu';
+
+    // 厳格な数理フォーマットエンジン
+    function formatValue(value, type) {
+      if (displayMode === 'gaisuu') {
+        if (type === 'press') return value.toString(); // 気圧はそのまま表す
+        // 気圧以外の全ての数字を「小数点以下1桁」で厳密に四捨五入して固定表示
+        return (Math.round(value * 10) / 10).toFixed(1);
+      } else {
+        // 精密モード
+        if (type === 'heading') return Math.round(value).toString(); // 電子ノイズ回避のため方位角は整数（前回の品質判断を維持）
+        if (type === 'press') return value.toString();
+        // 信頼できる天文学計算および固定値は「最大小数点以下4桁」でスマートトリミング
+        return parseFloat(Number(value).toFixed(4)).toString();
+      }
     }
-
-    // テキストデータの初期反映
-    document.getElementById('txtGeoData').innerText = `北緯 ${formatSmart(lat, 4)}° 東経 ${formatSmart(lon, 4)}°`;
-    document.getElementById('txtEnvData').innerText = `高度 ${heightVal}m 気温 ${tempVal}℃ 気圧 ${pressVal}hPa`;
 
     function to16Direction(deg) {
       const names = ["北", "北北東", "北東", "東北東", "東", "東南東", "南東", "南南東", "南", "南南西", "南西", "西南西", "西", "西北西", "北西", "北北西"];
       return names[Math.round(deg / 22.5) % 16];
     }
 
-    // LERP（線形補間）用変数（カクつきの完全排除用）
     let currentHeading = 0;
     let targetHeading = 0;
+    let currentMoonAlt = 0;
+    let currentMoonAz = 0;
+
+    function updateStaticData() {
+      const formattedLat = formatValue(lat, 'lat');
+      const formattedLon = formatValue(lon, 'lon');
+      const formattedHeight = formatValue(heightVal, 'height');
+      const formattedTemp = formatValue(tempVal, 'temp');
+      const formattedPress = formatValue(pressVal, 'press');
+
+      document.getElementById('txtGeoData').innerText = `北緯 ${formattedLat}° 東経 ${formattedLon}°`;
+      document.getElementById('txtEnvData').innerText = `高度 ${formattedHeight}m 気温 ${formattedTemp}℃ 気圧 ${formattedPress}hPa`;
+    }
 
     function updateMoon() {
       const now = new Date();
       const moonPos = SunCalc.getMoonPosition(now, lat, lon);
       
-      const altDeg = moonPos.altitude * (180 / Math.PI);
+      currentMoonAlt = moonPos.altitude * (180 / Math.PI);
       let azDeg = (moonPos.azimuth * (180 / Math.PI)) + 180;
-      azDeg = (azDeg + 360) % 360;
+      currentMoonAz = (azDeg + 360) % 360;
 
-      // 月の角度をガイドラインと絵文字にコミット
-      moonLine.style.transform = `rotate(${azDeg}deg)`;
-      moonMarker.style.transform = `rotate(${azDeg}deg)`;
+      moonLine.style.transform = `rotate(${currentMoonAz}deg)`;
+      moonMarker.style.transform = `rotate(${currentMoonAz}deg)`;
       
-      const moonDirStr = to16Direction(azDeg);
+      const moonDirStr = to16Direction(currentMoonAz);
+      const smartAlt = formatValue(currentMoonAlt, 'moonAlt');
+      const smartAz = formatValue(currentMoonAz, 'moonAz');
       
-      // 【データ品質判断】天文学的計算値は完全に信用できるため「最大4桁」まで解放
-      const smartAlt = formatSmart(altDeg, 4);
-      const smartAz = formatSmart(azDeg, 4);
+      // 高度と方位を完全に別々の行（文章）に射出。ガタつきや重なりを根本から防止
+      document.getElementById('txtMoonAlt').innerText = `月の高度 ${smartAlt}°`;
+      document.getElementById('txtMoonAz').innerText = `月の方位 ${moonDirStr} (${smartAz}°)`;
       
-      document.getElementById('txtMoonData').innerText = `月の高度 ${smartAlt}° ／ 方位 ${moonDirStr} (${smartAz}°)`;
-      
-      // 高度バーの真上のライブ数値も小数点以下最大4桁の信頼値にアップデート
       document.getElementById('altBarValue').innerText = `${smartAlt}°`;
       
-      const altPercent = Math.max(0, Math.min(100, (altDeg / 90) * 100));
+      const altPercent = Math.max(0, Math.min(100, (currentMoonAlt / 90) * 100));
       document.getElementById('altFill').style.height = altPercent + '%';
     }
 
@@ -375,26 +425,51 @@
       if (e.webkitCompassHeading !== undefined) {
         targetHeading = e.webkitCompassHeading;
         
-        // 【データ品質判断】ハードウェアセンサーの生方位はノイズが酷く信用できないため「整数」表示
-        document.getElementById('bigHeading').innerText = formatSmart(targetHeading, 0);
+        document.getElementById('bigHeading').innerText = formatValue(targetHeading, 'heading');
         document.getElementById('bigDirection').innerText = to16Direction(targetHeading);
         updateMoon();
       }
     }, false);
 
-    // 高級感のある滑らかな回転アニメーションを実現する描画ループ
+    // スイッチのインタラクション制御
+    const swGai = document.getElementById('swGai');
+    const swSei = document.getElementById('swSei');
+
+    function switchMode(mode) {
+      if (displayMode === mode) return;
+      displayMode = mode;
+      
+      if (mode === 'gaisuu') {
+        swGai.classList.add('active');
+        swSei.classList.remove('active');
+      } else {
+        swSei.classList.add('active');
+        swGai.classList.remove('active');
+      }
+      
+      // 画面上の全数値を即座に新モードのロジックに再コンパイル
+      updateStaticData();
+      updateMoon();
+      document.getElementById('bigHeading').innerText = formatValue(targetHeading, 'heading');
+    }
+
+    swGai.onclick = () => switchMode('gaisuu');
+    swSei.onclick = () => switchMode('seimitsu');
+
     function renderLoop() {
       let diff = targetHeading - currentHeading;
       while (diff < -180) diff += 360;
       while (diff > 180) diff -= 360;
-      
-      currentHeading += diff * 0.15; 
+      currentHeading += diff * 0.15;
 
       rose.style.transform = `rotate(${-currentHeading}deg)`;
       requestAnimationFrame(renderLoop);
     }
     requestAnimationFrame(renderLoop);
 
+    // 初期起動処理
+    updateStaticData();
+    
     document.getElementById('startBtn').onclick = () => {
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission().then(res => {
