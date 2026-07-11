@@ -35,7 +35,7 @@
       overflow: hidden;
     }
 
-    /* メインエリア：コンパスを280pxへ最大化し、高度メーターと並列配置 */
+    /* メインエリア：280pxのコンパスと、縦構造に最適化した高度メーターエリア */
     .main-visual-area {
       position: relative;
       display: flex;
@@ -45,10 +45,10 @@
       max-width: 360px;
       height: 290px;
       margin-bottom: 5px;
-      gap: 10px;
+      gap: 12px;
     }
 
-    /* コンパス外枠（直径280pxに拡大。中心座標は 140px, 140px） */
+    /* コンパス外枠（直径280px、中心座標は 140px, 140px） */
     .compass-viewport {
       position: relative;
       width: 280px;
@@ -67,7 +67,7 @@
     .crosshair-h { width: 80px; height: 1px; }
     .crosshair-v { width: 1px; height: 80px; }
 
-    /* 最上部の固定された基準線（現在地を示す棒） */
+    /* 最上部の固定された基準線 */
     .center-pointer {
       position: absolute;
       top: -12px;
@@ -85,7 +85,7 @@
       border-radius: 50%;
     }
 
-    /* 目盛り：すべての長さを16pxに完全統一 */
+    /* 目盛り */
     .tick {
       position: absolute;
       width: 1px;
@@ -93,7 +93,7 @@
       background: #444;
       left: 50%;
       top: 0;
-      transform-origin: 0 140px; /* 半径140px基準 */
+      transform-origin: 0 140px;
     }
     .tick.major { width: 2px; background: #bbb; }
     .tick.medium { background: #777; }
@@ -135,7 +135,7 @@
       transform-origin: 20px 164px;
     }
 
-    /* 月の方位の棒：現在地の基準線と全く同じ形状の「色違い」 */
+    /* 月の方位の棒 */
     .moon-guide-line {
       position: absolute;
       width: 2px;
@@ -143,7 +143,7 @@
       background-color: var(--moon-color);
       left: calc(50% - 1px);
       top: -12px;
-      transform-origin: 1px 152px; /* 中心(140px, 140px)基準 */
+      transform-origin: 1px 152px;
       z-index: 6;
     }
 
@@ -162,23 +162,14 @@
       z-index: 20;
     }
 
-    /* 右側エリア：バーを右端に寄せて数値のはみ出しを構造的に防ぐレイアウト */
+    /* 右側エリア：ご指示通り、バーの下に数値を縦並び（column）で配置 */
     .altitude-side-container {
       display: flex;
-      flex-direction: row; /* 横並びにして右詰めに */
+      flex-direction: column;
       align-items: center;
-      justify-content: flex-end;
-      gap: 6px;
-      width: 60px;
-      height: 140px;
-    }
-    .alt-live-value {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--moon-color);
-      font-variant-numeric: tabular-nums;
-      text-align: right;
-      flex: 1;
+      justify-content: center;
+      gap: 8px;
+      width: 46px;
     }
     .altitude-meter {
       height: 140px;
@@ -193,6 +184,14 @@
       background: var(--moon-color);
       border-radius: 2px;
       box-shadow: 0 0 8px rgba(249, 215, 28, 0.4);
+    }
+    .alt-live-value {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--moon-color);
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      white-space: nowrap;
     }
 
     /* 中央：現在の方位角（常に整数表記） */
@@ -217,19 +216,19 @@
     }
     .heading-direction { font-size: 38px; font-weight: 300; margin-left: 10px; }
 
-    /* 下部の広いスペースへ移動し、サイズを大きく拡張した横型セグメンテッドスイッチ */
+    /* 下部スペースを活用した、押しやすく視認性の高い大型横型スイッチ */
     .mode-switch {
       display: flex;
       flex-direction: row;
       background: #1c1c1e;
       border-radius: 8px;
       padding: 2px;
-      width: 180px; /* 横幅を大幅に拡大 */
+      width: 180px;
       margin: 0 auto 20px auto;
     }
     .sw-btn {
       font-size: 13px;
-      padding: 9px 0; /* タップ領域・上下サイズを大きく */
+      padding: 9px 0;
       flex: 1;
       text-align: center;
       cursor: pointer;
@@ -245,11 +244,11 @@
       font-weight: 600;
     }
 
-    /* 下部：データエリア（中央に寄せつつ、中身はすべて厳格に左詰め） */
+    /* 下部：データエリア（無駄を削ぎ落とし、厳格に左詰め） */
     .data-text-area {
       text-align: left;
       width: 100%;
-      max-width: 280px; /* テキストの始まりを揃えるための枠幅 */
+      max-width: 280px; /* 中央に寄せつつ、左端のラインを美しく統一するための枠幅 */
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -292,10 +291,10 @@
     </div>
     
     <div class="altitude-side-container">
-      <div class="alt-live-value" id="altBarValue">-°</div>
       <div class="altitude-meter">
         <div class="alt-bar-fill" id="altFill" style="height: 0%;"></div>
       </div>
+      <div class="alt-live-value" id="altBarValue">-°</div>
     </div>
   </div>
 
@@ -310,7 +309,6 @@
   </div>
 
   <div class="data-text-area">
-    <div class="data-line" id="txtMoonAlt">月の高度: -</div>
     <div class="data-line" id="txtMoonAz">月の方位: -</div>
     <div class="data-line" id="txtGeoData">北緯 - 東経 -</div>
     <div class="data-line data-line-sub" id="txtEnvData">高度 - ／ 気温 - ／ 気圧 -</div>
@@ -377,7 +375,7 @@
 
     // フォーマットエンジン
     function formatValue(value, type) {
-      // 現在方位(heading)はモードに関わらず常に整数に丸める
+      // 現在方位(heading)は常に整数
       if (type === 'heading') {
         return Math.round(value).toString();
       }
@@ -427,10 +425,10 @@
       const smartAlt = formatValue(currentMoonAlt, 'moonAlt');
       const smartAz = formatValue(currentMoonAz, 'moonAz');
       
-      // 高度と方位をそれぞれ独立した行に分け、左詰めで適用
-      document.getElementById('txtMoonAlt').innerText = `月の高度: ${smartAlt}°`;
+      // データエリアの「月の高度」行を完全に廃止し、「月の方位」から左詰めスタート
       document.getElementById('txtMoonAz').innerText = `月の方位: ${moonDirStr} (${smartAz}°)`;
       
+      // 高度バーの下の数値テキストを更新
       document.getElementById('altBarValue').innerText = `${smartAlt}°`;
       
       const altPercent = Math.max(0, Math.min(100, (currentMoonAlt / 90) * 100));
