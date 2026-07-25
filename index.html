@@ -8,8 +8,6 @@
   <title>MOON COMPASS</title>
   <link rel="manifest" href="manifest.json">
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
-
   <style>
     :root {
       --bg-color: #000000;
@@ -399,6 +397,151 @@
     let currentMoonAlt = 0;
     let currentMoonAz = 0;
 
+    function calculateMoonPosition(dateObj, lon, lat, height, temp, pressure) {
+        const rad = Math.PI / 180;
+        const deg = 180 / Math.PI;
+
+        const jd = (dateObj.getTime() / 86400000) + 2440587.5; 
+        const d = jd - 2451545.0;                          
+        const T = d / 36525;                               
+
+        const deltaT_days = 69.2 / 86400;
+        const d_tt = d + deltaT_days;
+
+        const L_prime = (218.3164477 + 13.17639648 * d_tt) % 360; 
+        const D       = (297.8501921 + 12.19074912 * d_tt) % 360; 
+        const M       = (357.5291092 + 0.98560028 * d_tt) % 360;  
+        const M_prime = (134.9633964 + 13.06499295 * d_tt) % 360; 
+        const F       = (93.2720950 + 13.22935026 * d_tt) % 360;  
+
+        const D_r = D * rad; const M_r = M * rad; const Mp_r = M_prime * rad; const F_r = F * rad;
+
+        const D2 = 2 * D_r;
+        const Mp2 = 2 * Mp_r;
+        const F2 = 2 * F_r;
+
+        const sin_Mp = Math.sin(Mp_r);
+        const cos_Mp = Math.cos(Mp_r);
+        const sin_M = Math.sin(M_r);
+        const sin_F = Math.sin(F_r);
+        
+        const sin_D2 = Math.sin(D2);
+        const cos_D2 = Math.cos(D2);
+        const sin_Mp2 = Math.sin(Mp2);
+        const cos_Mp2 = Math.cos(Mp2);
+        const sin_F2 = Math.sin(F2);
+
+        const D2_Mp = D2 - Mp_r;
+        const sin_D2_Mp = Math.sin(D2_Mp);
+        const cos_D2_Mp = Math.cos(D2_Mp);
+
+        let dLng = 6.288774 * sin_Mp
+                 + 1.274027 * sin_D2_Mp
+                 + 0.658314 * sin_D2
+                 + 0.213618 * sin_Mp2
+                 - 0.185116 * sin_M
+                 - 0.114332 * sin_F2
+                 + 0.058793 * Math.sin(D2 - Mp2)
+                 + 0.057066 * Math.sin(D2 - M_r - Mp_r)
+                 + 0.053322 * Math.sin(D2 + Mp_r)
+                 + 0.045758 * Math.sin(D2 - M_r);
+        
+        let moonLon = (L_prime + dLng) * rad;
+        const sin_moonLon = Math.sin(moonLon);
+        const cos_moonLon = Math.cos(moonLon);
+
+        let dLat = 5.128122 * sin_F
+                 + 0.280602 * Math.sin(D2 - F_r)
+                 + 0.277387 * Math.sin(D2_Mp + F_r)
+                 + 0.173238 * Math.sin(D2 + F_r)
+                 + 0.055413 * Math.sin(Mp_r + F_r)
+                 + 0.046271 * Math.sin(Mp_r - F_r);
+                 
+        let moonLat = dLat * rad;
+        const sin_moonLat = Math.sin(moonLat);
+        const cos_moonLat = Math.cos(moonLat);
+
+        let pi_deg = 0.950724 
+                   + 0.051818 * cos_Mp
+                   + 0.009531 * cos_D2_Mp
+                   + 0.007843 * cos_D2
+                   + 0.002824 * cos_Mp2;
+        let pi_rad = pi_deg * rad;
+        const sin_pi = Math.sin(pi_rad);
+
+        const eps = (23.439291 - 0.0130042 * T) * rad; 
+        const sin_eps = Math.sin(eps);
+        const cos_eps = Math.cos(eps);
+
+        const sin_dec = sin_moonLat * cos_eps + cos_moonLat * sin_eps * sin_moonLon;
+        const dec = Math.asin(sin_dec);
+        const sin_dec_final = Math.sin(dec);
+        const cos_dec_final = Math.cos(dec);
+
+        const ra = Math.atan2(
+            -sin_moonLat * sin_eps + cos_moonLat * cos_eps * sin_moonLon,
+            cos_moonLat * cos_moonLon
+        );
+
+        const gmst = 280.46061837 + 360.98564736629 * d + 0.000387933 * T * T;
+        const lst = (((gmst + lon) % 360 + 360) % 360) * rad;
+        const H = lst - ra; 
+        const sin_H = Math.sin(H);
+        const cos_H = Math.cos(H);
+
+        const f = 1 / 298.257223563; 
+        const latRad = lat * rad;
+        const sin_lat = Math.sin(latRad);
+        const cos_lat = Math.cos(latRad);
+
+        const u = Math.atan((1 - f) * Math.tan(latRad));
+        const sin_u = Math.sin(u);
+        const cos_u = Math.cos(u);
+        
+        const H_r = height / 6378137.0;
+        const rho_sin = (1 - f) * sin_u + H_r * sin_lat;
+        const rho_cos = cos_u + H_r * cos_lat;
+
+        const delta_ra = Math.atan2(
+            -rho_cos * sin_pi * sin_H,
+            cos_dec_final - rho_cos * sin_pi * cos_H
+        );
+        const H_top = H - delta_ra;
+        
+        const dec_top = Math.atan2(
+            (sin_dec_final - rho_sin * sin_pi) * Math.cos(delta_ra),
+            cos_dec_final - rho_cos * sin_pi * cos_H
+        );
+
+        const sin_dec_top = Math.sin(dec_top);
+        const cos_dec_top = Math.cos(dec_top);
+        const sin_H_top = Math.sin(H_top);
+        const cos_H_top = Math.cos(H_top);
+
+        const sin_h_true = sin_lat * sin_dec_top + cos_lat * cos_dec_top * cos_H_top;
+        const h_true_deg = Math.asin(sin_h_true) * deg;
+
+        const yNav = -sin_H_top * cos_dec_top;
+        const xNav = sin_dec_top * cos_lat - cos_dec_top * sin_lat * cos_H_top;
+        let azimuthResult = Math.atan2(yNav, xNav) * deg;
+        if (azimuthResult < 0) azimuthResult += 360;
+
+        let finalAltitude = h_true_deg;
+        if (h_true_deg > -1.0) { 
+            const r0 = 1.02 / Math.tan((h_true_deg + 10.3 / (h_true_deg + 5.11)) * rad);
+            const refraction_min = r0 * (pressure / 1013.25) * (288.15 / (273.15 + temp));
+            finalAltitude += (refraction_min / 60.0);
+        }
+
+        let roundedAzimuth = Math.round(azimuthResult);
+        if (roundedAzimuth === 360) roundedAzimuth = 0; 
+
+        return {
+            altitude: parseFloat(finalAltitude.toFixed(2)), 
+            azimuth:  roundedAzimuth
+        };
+    }
+
     function updateStaticData() {
       const formattedLat = formatValue(lat, 'lat');
       const formattedLon = formatValue(lon, 'lon');
@@ -412,11 +555,11 @@
 
     function updateMoon() {
       const now = new Date();
-      const moonPos = SunCalc.getMoonPosition(now, lat, lon);
+      // Meeusアルゴリズムによる高精度計算 (大気差・高度補正含む)
+      const moonPos = calculateMoonPosition(now, lon, lat, heightVal, tempVal, pressVal);
       
-      currentMoonAlt = moonPos.altitude * (180 / Math.PI);
-      let azDeg = (moonPos.azimuth * (180 / Math.PI)) + 180;
-      currentMoonAz = (azDeg + 360) % 360;
+      currentMoonAlt = moonPos.altitude;
+      currentMoonAz = moonPos.azimuth;
 
       moonLine.style.transform = `rotate(${currentMoonAz}deg)`;
       moonMarker.style.transform = `rotate(${currentMoonAz}deg)`;
