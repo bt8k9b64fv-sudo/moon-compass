@@ -65,14 +65,14 @@
     .crosshair-h { width: 80px; height: 1px; }
     .crosshair-v { width: 1px; height: 80px; }
 
-    /* 最上部の固定された基準線 */
+    /* 最上部の固定された基準線 (現在方位) */
     .center-pointer {
       position: absolute;
       top: -12px;
       width: 2px;
       height: 32px;
       background-color: var(--accent-color);
-      z-index: 10;
+      z-index: 10; /* 月の棒より下にするため数値を調整 */
     }
 
     /* 回転する文字盤 */
@@ -133,7 +133,7 @@
       transform-origin: 20px 164px;
     }
 
-    /* 月の方位の棒 */
+    /* 月の方位の棒 (基準線の上に重なるように z-index を15に設定) */
     .moon-guide-line {
       position: absolute;
       width: 2px;
@@ -142,7 +142,7 @@
       left: calc(50% - 1px);
       top: -12px;
       transform-origin: 1px 152px;
-      z-index: 6;
+      z-index: 15; /* 白い基準線(10)の上に重なる */
     }
 
     /* 月のマーカー */
@@ -246,7 +246,7 @@
     .data-text-area {
       text-align: left;
       width: 100%;
-      max-width: 280px; /* 中央に寄せつつ、左端のラインを美しく統一するための枠幅 */
+      max-width: 280px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -380,10 +380,12 @@
       
       if (displayMode === 'gaisuu') {
         if (type === 'press') return value.toString();
-        return (Math.round(value * 10) / 10).toString();
+        // 概数モードは小数点第1位まで
+        return (Math.round(value * 10) / 10).toFixed(1);
       } else {
         if (type === 'press') return value.toString();
-        return parseFloat(Number(value).toFixed(4)).toString();
+        // 精密モード時は、末尾のゼロも含めて厳密に「小数点第4位」を描画
+        return Number(value).toFixed(4);
       }
     }
 
@@ -525,6 +527,7 @@
         const xNav = sin_dec_top * cos_lat - cos_dec_top * sin_lat * cos_H_top;
         let azimuthResult = Math.atan2(yNav, xNav) * deg;
         if (azimuthResult < 0) azimuthResult += 360;
+        if (azimuthResult >= 360) azimuthResult -= 360;
 
         let finalAltitude = h_true_deg;
         if (h_true_deg > -1.0) { 
@@ -533,12 +536,10 @@
             finalAltitude += (refraction_min / 60.0);
         }
 
-        let roundedAzimuth = Math.round(azimuthResult);
-        if (roundedAzimuth === 360) roundedAzimuth = 0; 
-
+        // ここが重要：丸め処理を完全撤廃し、生の浮動小数点数（Float）をそのまま出力する
         return {
-            altitude: parseFloat(finalAltitude.toFixed(2)), 
-            azimuth:  roundedAzimuth
+            altitude: finalAltitude, 
+            azimuth:  azimuthResult
         };
     }
 
