@@ -2,12 +2,20 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
+  >
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+
   <title>MOON COMPASS</title>
-  <link rel="manifest" href="manifest.json">
-  
+
+  manifest.json
+
   <style>
     :root {
       --bg-color: #000000;
@@ -17,14 +25,22 @@
       --gray-text: #8e8e93;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       background-color: var(--bg-color);
       color: var(--accent-color);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Helvetica Neue",
+        sans-serif;
       margin: 0;
-      padding: 60px 16px 30px 16px;
+      padding: 60px 16px 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -33,7 +49,6 @@
       overflow: hidden;
     }
 
-    /* メインエリア：280pxのコンパスと、縦構造に最適化した高度メーターエリア */
     .main-visual-area {
       position: relative;
       display: flex;
@@ -46,7 +61,6 @@
       gap: 12px;
     }
 
-    /* コンパス外枠（直径280px、中心座標は 140px, 140px） */
     .compass-viewport {
       position: relative;
       width: 280px;
@@ -56,16 +70,23 @@
       justify-content: center;
     }
 
-    /* 中央の十字線 */
-    .crosshair-h, .crosshair-v {
+    .crosshair-h,
+    .crosshair-v {
       position: absolute;
-      background: rgba(255,255,255,0.12);
+      background: rgba(255, 255, 255, 0.12);
       z-index: 5;
     }
-    .crosshair-h { width: 80px; height: 1px; }
-    .crosshair-v { width: 1px; height: 80px; }
 
-    /* 最上部の固定された基準線 */
+    .crosshair-h {
+      width: 80px;
+      height: 1px;
+    }
+
+    .crosshair-v {
+      width: 1px;
+      height: 80px;
+    }
+
     .center-pointer {
       position: absolute;
       top: -12px;
@@ -75,15 +96,14 @@
       z-index: 10;
     }
 
-    /* 回転する文字盤 */
     .compass-rose {
       position: absolute;
       width: 100%;
       height: 100%;
       border-radius: 50%;
+      will-change: transform;
     }
 
-    /* 目盛り */
     .tick {
       position: absolute;
       width: 1px;
@@ -93,21 +113,28 @@
       top: 0;
       transform-origin: 0 140px;
     }
-    .tick.major { width: 2px; background: #bbb; }
-    .tick.medium { background: #777; }
-    
-    /* 0度（北）の赤い三角マーカー */
-    .tick.north { 
-      background: transparent; 
-      width: 0; height: 0;
+
+    .tick.major {
+      width: 2px;
+      background: #bbb;
+    }
+
+    .tick.medium {
+      background: #777;
+    }
+
+    .tick.north {
+      background: transparent;
+      width: 0;
+      height: 0;
       border-left: 5px solid transparent;
       border-right: 5px solid transparent;
       border-top: 14px solid var(--north-color);
-      top: 2px; left: calc(50% - 5px);
+      top: 2px;
+      left: calc(50% - 5px);
       transform-origin: 5px 138px;
     }
 
-    /* 方位文字 */
     .direction-label {
       position: absolute;
       width: 40px;
@@ -120,7 +147,6 @@
       transform-origin: 20px 116px;
     }
 
-    /* 外周の角度数字 */
     .degree-label {
       position: absolute;
       width: 40px;
@@ -133,7 +159,6 @@
       transform-origin: 20px 164px;
     }
 
-    /* 月の方位の棒 */
     .moon-guide-line {
       position: absolute;
       width: 2px;
@@ -145,7 +170,6 @@
       z-index: 6;
     }
 
-    /* 月のマーカー */
     .moon-marker {
       position: absolute;
       width: 30px;
@@ -160,7 +184,11 @@
       z-index: 20;
     }
 
-    /* 右側エリア：ご指示通り、バーの下に数値を縦並び（column）で配置 */
+    .moon-marker.below-horizon {
+      filter: grayscale(1);
+      -webkit-filter: grayscale(1);
+    }
+
     .altitude-side-container {
       display: flex;
       flex-direction: column;
@@ -169,20 +197,24 @@
       gap: 8px;
       width: 46px;
     }
+
     .altitude-meter {
       height: 140px;
       width: 4px;
-      background: rgba(255,255,255,0.15);
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 2px;
       display: flex;
       flex-direction: column-reverse;
     }
+
     .alt-bar-fill {
       width: 100%;
+      height: 0%;
       background: var(--moon-color);
       border-radius: 2px;
       box-shadow: 0 0 8px rgba(249, 215, 28, 0.4);
     }
+
     .alt-live-value {
       font-size: 12px;
       font-weight: 500;
@@ -192,7 +224,6 @@
       white-space: nowrap;
     }
 
-    /* 中央：現在の方位角（常に整数表記） */
     .heading-display {
       text-align: center;
       width: 100%;
@@ -201,20 +232,26 @@
       align-items: baseline;
       justify-content: center;
     }
-    .heading-value { 
-      font-size: 76px; 
-      font-weight: 200; 
+
+    .heading-value {
+      font-size: 76px;
+      font-weight: 200;
       letter-spacing: -2px;
       font-variant-numeric: tabular-nums;
     }
-    .heading-unit { 
-      font-size: 76px; 
-      font-weight: 200; 
-      margin-left: -2px; 
-    }
-    .heading-direction { font-size: 38px; font-weight: 300; margin-left: 10px; }
 
-    /* 下部スペースを活用した、押しやすく視認性の高い大型横型スイッチ */
+    .heading-unit {
+      font-size: 76px;
+      font-weight: 200;
+      margin-left: -2px;
+    }
+
+    .heading-direction {
+      font-size: 38px;
+      font-weight: 300;
+      margin-left: 10px;
+    }
+
     .mode-switch {
       display: flex;
       flex-direction: row;
@@ -222,8 +259,9 @@
       border-radius: 8px;
       padding: 2px;
       width: 180px;
-      margin: 0 auto 20px auto;
+      margin: 0 auto 20px;
     }
+
     .sw-btn {
       font-size: 13px;
       padding: 9px 0;
@@ -234,50 +272,77 @@
       font-weight: 500;
       user-select: none;
       -webkit-user-select: none;
-      transition: background 0.15s, color 0.15s;
+      transition:
+        background 0.15s,
+        color 0.15s;
     }
+
     .sw-btn.active {
       background: #3a3a3c;
       color: #ffffff;
       font-weight: 600;
     }
 
-    /* 下部：データエリア（無駄を削ぎ落とし、厳格に左詰め） */
     .data-text-area {
       text-align: left;
       width: 100%;
-      max-width: 280px; /* 中央に寄せつつ、左端のラインを美しく統一するための枠幅 */
+      max-width: 280px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-    .data-line { 
-      font-size: 14px; 
-      font-weight: 400; 
-      color: #ffffff; 
-      letter-spacing: 0.5px; 
+
+    .data-line {
+      font-size: 14px;
+      font-weight: 400;
+      color: #ffffff;
+      letter-spacing: 0.5px;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
-    .data-line-sub { font-size: 12px; color: var(--gray-text); }
 
-    /* 起動画面 */
-    .start-overlay {
-      position: fixed; inset: 0; background: var(--bg-color);
-      z-index: 100; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+    .data-line-sub {
+      font-size: 12px;
+      color: var(--gray-text);
     }
+
+    .start-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-color);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
     .btn {
-      background: #fff; color: #000; border: none; padding: 16px 32px;
-      border-radius: 30px; font-size: 16px; font-weight: bold;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+      background: #e5e5e5;
     }
   </style>
 </head>
-<body>
 
+<body>
   <div class="start-overlay" id="overlay">
-    <button class="btn" id="startBtn">コンパスを起動</button>
+    <button class="btn" id="startBtn" type="button">
+      方位センサーを起動
+    </button>
   </div>
 
   <div class="main-visual-area">
@@ -287,353 +352,1047 @@
       <div class="center-pointer"></div>
       <div class="compass-rose" id="rose"></div>
     </div>
-    
+
     <div class="altitude-side-container">
       <div class="altitude-meter">
-        <div class="alt-bar-fill" id="altFill" style="height: 0%;"></div>
+        <div class="alt-bar-fill" id="altFill"></div>
       </div>
-      <div class="alt-live-value" id="altBarValue">-°</div>
+
+      <div class="alt-live-value" id="altBarValue">
+        -°
+      </div>
     </div>
   </div>
 
   <div class="heading-display">
-    <span class="heading-value" id="bigHeading">0</span><span class="heading-unit">°</span>
+    <span class="heading-value" id="bigHeading">0</span>
+    <span class="heading-unit">°</span>
     <span class="heading-direction" id="bigDirection">北</span>
   </div>
 
   <div class="mode-switch">
-    <div id="swGai" class="sw-btn active">概数</div>
-    <div id="swSei" class="sw-btn">精密</div>
+    <div id="swGai" class="sw-btn active">
+      標準
+    </div>
+
+    <div id="swSei" class="sw-btn">
+      詳細
+    </div>
   </div>
 
   <div class="data-text-area">
-    <div class="data-line" id="txtMoonAz">月の方位: -</div>
-    <div class="data-line" id="txtGeoData">北緯 - 東経 -</div>
-    <div class="data-line data-line-sub" id="txtEnvData">高度 - ／ 気温 - ／ 気圧 -</div>
+    <div class="data-line" id="txtMoonAz">
+      月の方位: -
+    </div>
+
+    <div class="data-line" id="txtGeoData">
+      北緯 - 東経 -
+    </div>
+
+    <div class="data-line data-line-sub" id="txtEnvData">
+      高度 - ／ 気温 - ／ 気圧 -
+    </div>
   </div>
 
   <script>
-    const rose = document.getElementById('rose');
-    
-    // 目盛りの自動生成（半径140pxベース）
-    for (let i = 0; i < 360; i += 2) {
-      const tick = document.createElement('div');
+    const rose =
+      document.getElementById('rose');
+
+    const moonAltitudeValueElement =
+      document.getElementById('altBarValue');
+
+    const moonAzimuthElement =
+      document.getElementById('txtMoonAz');
+
+    const bigHeadingElement =
+      document.getElementById('bigHeading');
+
+    const bigDirectionElement =
+      document.getElementById('bigDirection');
+
+    const altitudeFillElement =
+      document.getElementById('altFill');
+
+    const startOverlay =
+      document.getElementById('overlay');
+
+    const startButton =
+      document.getElementById('startBtn');
+
+    const geoDataElement =
+      document.getElementById('txtGeoData');
+
+    const environmentDataElement =
+      document.getElementById('txtEnvData');
+
+    for (let angle = 0; angle < 360; angle += 2) {
+      const tick =
+        document.createElement('div');
+
       tick.className = 'tick';
-      if (i === 0) {
+
+      if (angle === 0) {
         tick.classList.add('north');
-      } else if (i % 30 === 0) {
+      } else if (angle % 30 === 0) {
         tick.classList.add('major');
-      } else if (i % 10 === 0) {
+      } else if (angle % 10 === 0) {
         tick.classList.add('medium');
       }
-      tick.style.transform = `rotate(${i}deg)`;
+
+      tick.style.transform =
+        `rotate(${angle}deg)`;
+
       rose.appendChild(tick);
     }
 
-    // 四方文字
-    const dirs = { 0: '北', 90: '東', 180: '南', 270: '西' };
-    for (let angle in dirs) {
-      const label = document.createElement('div');
-      label.className = 'direction-label';
-      label.innerText = dirs[angle];
-      label.style.transform = `rotate(${angle}deg)`;
+    const directionLabels = {
+      0: '北',
+      90: '東',
+      180: '南',
+      270: '西'
+    };
+
+    for (const angle in directionLabels) {
+      const label =
+        document.createElement('div');
+
+      label.className =
+        'direction-label';
+
+      label.innerText =
+        directionLabels[angle];
+
+      label.style.transform =
+        `rotate(${angle}deg)`;
+
       rose.appendChild(label);
     }
 
-    // 角度数字
-    for (let i = 30; i < 360; i += 30) {
-      if (i === 90 || i === 180 || i === 270) continue;
-      const numLabel = document.createElement('div');
-      numLabel.className = 'degree-label';
-      numLabel.innerText = i;
-      numLabel.style.transform = `rotate(${i}deg)`;
-      rose.appendChild(numLabel);
+    for (let angle = 30; angle < 360; angle += 30) {
+      if (
+        angle === 90 ||
+        angle === 180 ||
+        angle === 270
+      ) {
+        continue;
+      }
+
+      const numberLabel =
+        document.createElement('div');
+
+      numberLabel.className =
+        'degree-label';
+
+      numberLabel.innerText =
+        angle.toString();
+
+      numberLabel.style.transform =
+        `rotate(${angle}deg)`;
+
+      rose.appendChild(numberLabel);
     }
 
-    // 月の方位の棒
-    const moonLine = document.createElement('div');
-    moonLine.className = 'moon-guide-line';
+    const moonLine =
+      document.createElement('div');
+
+    moonLine.className =
+      'moon-guide-line';
+
     rose.appendChild(moonLine);
 
-    // 月マーカー
-    const moonMarker = document.createElement('div');
-    moonMarker.className = 'moon-marker';
-    moonMarker.innerHTML = '🌕';
+    const moonMarker =
+      document.createElement('div');
+
+    moonMarker.className =
+      'moon-marker';
+
+    moonMarker.innerHTML =
+      '🌕';
+
     rose.appendChild(moonMarker);
 
-    // URLパラメータ
-    const urlParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(urlParams.get('lat')) || 35.6586;
-    const lon = parseFloat(urlParams.get('lon')) || 139.7454;
-    const heightVal = parseFloat(urlParams.get('height')) || 0;
-    const tempVal = parseFloat(urlParams.get('temp')) || 0;
-    const pressVal = parseFloat(urlParams.get('press')) || 1013.25;
+    const urlParams =
+      new URLSearchParams(
+        window.location.search
+      );
 
-    let displayMode = 'gaisuu';
+    function parseParameter(
+      parameterName,
+      defaultValue
+    ) {
+      const rawValue =
+        urlParams.get(parameterName);
 
-    // フォーマットエンジン
-    function formatValue(value, type) {
-      // 現在方位(heading)は常に整数
-      if (type === 'heading') {
-        return Math.round(value).toString();
+      if (
+        rawValue === null ||
+        rawValue === ''
+      ) {
+        return defaultValue;
       }
-      
-      if (displayMode === 'gaisuu') {
-        if (type === 'press') return value.toString();
-        return (Math.round(value * 10) / 10).toString();
-      } else {
-        if (type === 'press') return value.toString();
-        return parseFloat(Number(value).toFixed(4)).toString();
+
+      const parsedValue =
+        Number(rawValue);
+
+      if (Number.isFinite(parsedValue)) {
+        return parsedValue;
       }
+
+      return defaultValue;
     }
 
-    function to16Direction(deg) {
-      const names = ["北", "北北東", "北東", "東北東", "東", "東南東", "南東", "南南東", "南", "南南西", "南西", "西南西", "西", "西北西", "北西", "北北西"];
-      return names[Math.round(deg / 22.5) % 16];
+    const latitude =
+      parseParameter(
+        'lat',
+        35.6586
+      );
+
+    const longitude =
+      parseParameter(
+        'lon',
+        139.7454
+      );
+
+    const observerHeight =
+      parseParameter(
+        'height',
+        0
+      );
+
+    const temperature =
+      parseParameter(
+        'temp',
+        15
+      );
+
+    const pressure =
+      parseParameter(
+        'press',
+        1013.25
+      );
+
+    let displayMode =
+      'standard';
+
+    let moonUpdateTimer =
+      null;
+
+    const STANDARD_UPDATE_INTERVAL_MS =
+      10000;
+
+    const DETAIL_UPDATE_INTERVAL_MS =
+      250;
+
+    function normalizeDegrees(value) {
+      return (
+        (value % 360) + 360
+      ) % 360;
     }
 
-    let currentHeading = 0;
-    let targetHeading = 0;
-    let currentMoonAlt = 0;
-    let currentMoonAz = 0;
+    function to16Direction(degrees) {
+      const names = [
+        '北',
+        '北北東',
+        '北東',
+        '東北東',
+        '東',
+        '東南東',
+        '南東',
+        '南南東',
+        '南',
+        '南南西',
+        '南西',
+        '西南西',
+        '西',
+        '西北西',
+        '北西',
+        '北北西'
+      ];
 
-    function calculateMoonPosition(dateObj, lon, lat, height, temp, pressure) {
-        const rad = Math.PI / 180;
-        const deg = 180 / Math.PI;
+      const normalized =
+        normalizeDegrees(degrees);
 
-        const jd = (dateObj.getTime() / 86400000) + 2440587.5; 
-        const d = jd - 2451545.0;                          
-        const T = d / 36525;                               
+      const index =
+        Math.round(
+          normalized / 22.5
+        ) % 16;
 
-        const deltaT_days = 69.2 / 86400;
-        const d_tt = d + deltaT_days;
-
-        const L_prime = (218.3164477 + 13.17639648 * d_tt) % 360; 
-        const D       = (297.8501921 + 12.19074912 * d_tt) % 360; 
-        const M       = (357.5291092 + 0.98560028 * d_tt) % 360;  
-        const M_prime = (134.9633964 + 13.06499295 * d_tt) % 360; 
-        const F       = (93.2720950 + 13.22935026 * d_tt) % 360;  
-
-        const D_r = D * rad; const M_r = M * rad; const Mp_r = M_prime * rad; const F_r = F * rad;
-
-        const D2 = 2 * D_r;
-        const Mp2 = 2 * Mp_r;
-        const F2 = 2 * F_r;
-
-        const sin_Mp = Math.sin(Mp_r);
-        const cos_Mp = Math.cos(Mp_r);
-        const sin_M = Math.sin(M_r);
-        const sin_F = Math.sin(F_r);
-        
-        const sin_D2 = Math.sin(D2);
-        const cos_D2 = Math.cos(D2);
-        const sin_Mp2 = Math.sin(Mp2);
-        const cos_Mp2 = Math.cos(Mp2);
-        const sin_F2 = Math.sin(F2);
-
-        const D2_Mp = D2 - Mp_r;
-        const sin_D2_Mp = Math.sin(D2_Mp);
-        const cos_D2_Mp = Math.cos(D2_Mp);
-
-        let dLng = 6.288774 * sin_Mp
-                 + 1.274027 * sin_D2_Mp
-                 + 0.658314 * sin_D2
-                 + 0.213618 * sin_Mp2
-                 - 0.185116 * sin_M
-                 - 0.114332 * sin_F2
-                 + 0.058793 * Math.sin(D2 - Mp2)
-                 + 0.057066 * Math.sin(D2 - M_r - Mp_r)
-                 + 0.053322 * Math.sin(D2 + Mp_r)
-                 + 0.045758 * Math.sin(D2 - M_r);
-        
-        let moonLon = (L_prime + dLng) * rad;
-        const sin_moonLon = Math.sin(moonLon);
-        const cos_moonLon = Math.cos(moonLon);
-
-        let dLat = 5.128122 * sin_F
-                 + 0.280602 * Math.sin(D2 - F_r)
-                 + 0.277387 * Math.sin(D2_Mp + F_r)
-                 + 0.173238 * Math.sin(D2 + F_r)
-                 + 0.055413 * Math.sin(Mp_r + F_r)
-                 + 0.046271 * Math.sin(Mp_r - F_r);
-                 
-        let moonLat = dLat * rad;
-        const sin_moonLat = Math.sin(moonLat);
-        const cos_moonLat = Math.cos(moonLat);
-
-        let pi_deg = 0.950724 
-                   + 0.051818 * cos_Mp
-                   + 0.009531 * cos_D2_Mp
-                   + 0.007843 * cos_D2
-                   + 0.002824 * cos_Mp2;
-        let pi_rad = pi_deg * rad;
-        const sin_pi = Math.sin(pi_rad);
-
-        const eps = (23.439291 - 0.0130042 * T) * rad; 
-        const sin_eps = Math.sin(eps);
-        const cos_eps = Math.cos(eps);
-
-        const sin_dec = sin_moonLat * cos_eps + cos_moonLat * sin_eps * sin_moonLon;
-        const dec = Math.asin(sin_dec);
-        const sin_dec_final = Math.sin(dec);
-        const cos_dec_final = Math.cos(dec);
-
-        const ra = Math.atan2(
-            -sin_moonLat * sin_eps + cos_moonLat * cos_eps * sin_moonLon,
-            cos_moonLat * cos_moonLon
-        );
-
-        const gmst = 280.46061837 + 360.98564736629 * d + 0.000387933 * T * T;
-        const lst = (((gmst + lon) % 360 + 360) % 360) * rad;
-        const H = lst - ra; 
-        const sin_H = Math.sin(H);
-        const cos_H = Math.cos(H);
-
-        const f = 1 / 298.257223563; 
-        const latRad = lat * rad;
-        const sin_lat = Math.sin(latRad);
-        const cos_lat = Math.cos(latRad);
-
-        const u = Math.atan((1 - f) * Math.tan(latRad));
-        const sin_u = Math.sin(u);
-        const cos_u = Math.cos(u);
-        
-        const H_r = height / 6378137.0;
-        const rho_sin = (1 - f) * sin_u + H_r * sin_lat;
-        const rho_cos = cos_u + H_r * cos_lat;
-
-        const delta_ra = Math.atan2(
-            -rho_cos * sin_pi * sin_H,
-            cos_dec_final - rho_cos * sin_pi * cos_H
-        );
-        const H_top = H - delta_ra;
-        
-        const dec_top = Math.atan2(
-            (sin_dec_final - rho_sin * sin_pi) * Math.cos(delta_ra),
-            cos_dec_final - rho_cos * sin_pi * cos_H
-        );
-
-        const sin_dec_top = Math.sin(dec_top);
-        const cos_dec_top = Math.cos(dec_top);
-        const sin_H_top = Math.sin(H_top);
-        const cos_H_top = Math.cos(H_top);
-
-        const sin_h_true = sin_lat * sin_dec_top + cos_lat * cos_dec_top * cos_H_top;
-        const h_true_deg = Math.asin(sin_h_true) * deg;
-
-        const yNav = -sin_H_top * cos_dec_top;
-        const xNav = sin_dec_top * cos_lat - cos_dec_top * sin_lat * cos_H_top;
-        let azimuthResult = Math.atan2(yNav, xNav) * deg;
-        if (azimuthResult < 0) azimuthResult += 360;
-
-        let finalAltitude = h_true_deg;
-        if (h_true_deg > -1.0) { 
-            const r0 = 1.02 / Math.tan((h_true_deg + 10.3 / (h_true_deg + 5.11)) * rad);
-            const refraction_min = r0 * (pressure / 1013.25) * (288.15 / (273.15 + temp));
-            finalAltitude += (refraction_min / 60.0);
-        }
-
-        let roundedAzimuth = Math.round(azimuthResult);
-        if (roundedAzimuth === 360) roundedAzimuth = 0; 
-
-        return {
-            altitude: parseFloat(finalAltitude.toFixed(2)), 
-            azimuth:  roundedAzimuth
-        };
+      return names[index];
     }
+
+    function formatMoonValue(value) {
+      if (displayMode === 'detail') {
+        return Number(value).toFixed(4);
+      }
+
+      return Math.round(value).toString();
+    }
+
+    function formatEnvironmentValue(value) {
+      if (displayMode === 'detail') {
+        return parseFloat(
+          Number(value).toFixed(4)
+        ).toString();
+      }
+
+      return (
+        Math.round(value * 10) / 10
+      ).toString();
+    }
+
+    function calculateWestDeclination(
+      latitudeValue,
+      longitudeValue
+    ) {
+      const deltaLatitude =
+        latitudeValue - 37.0;
+
+      const deltaLongitude =
+        longitudeValue - 138.0;
+
+      const declinationMinutes =
+        (8 * 60 + 15.822)
+        + 18.462 * deltaLatitude
+        - 7.726 * deltaLongitude
+        + 0.007
+          * deltaLatitude
+          * deltaLatitude
+        - 0.007
+          * deltaLatitude
+          * deltaLongitude
+        - 0.655
+          * deltaLongitude
+          * deltaLongitude;
+
+      return declinationMinutes / 60.0;
+    }
+
+    const westDeclination =
+      calculateWestDeclination(
+        latitude,
+        longitude
+      );
+
+    function magneticToTrueHeading(
+      magneticHeading
+    ) {
+      return normalizeDegrees(
+        magneticHeading
+        - westDeclination
+      );
+    }
+
+    function calculateMoonPosition(
+      dateObject,
+      longitudeValue,
+      latitudeValue,
+      heightValue,
+      temperatureValue,
+      pressureValue
+    ) {
+      const rad =
+        Math.PI / 180;
+
+      const deg =
+        180 / Math.PI;
+
+      const jd =
+        (
+          dateObject.getTime()
+          / 86400000
+        )
+        + 2440587.5;
+
+      const d =
+        jd - 2451545.0;
+
+      const T =
+        d / 36525;
+
+      const deltaTDays =
+        69.2 / 86400;
+
+      const dTt =
+        d + deltaTDays;
+
+      const LPrime =
+        (
+          218.3164477
+          + 13.17639648 * dTt
+        ) % 360;
+
+      const D =
+        (
+          297.8501921
+          + 12.19074912 * dTt
+        ) % 360;
+
+      const M =
+        (
+          357.5291092
+          + 0.98560028 * dTt
+        ) % 360;
+
+      const MPrime =
+        (
+          134.9633964
+          + 13.06499295 * dTt
+        ) % 360;
+
+      const F =
+        (
+          93.2720950
+          + 13.22935026 * dTt
+        ) % 360;
+
+      const Dr =
+        D * rad;
+
+      const Mr =
+        M * rad;
+
+      const Mpr =
+        MPrime * rad;
+
+      const Fr =
+        F * rad;
+
+      const D2 =
+        2 * Dr;
+
+      const Mp2 =
+        2 * Mpr;
+
+      const F2 =
+        2 * Fr;
+
+      const sinMp =
+        Math.sin(Mpr);
+
+      const cosMp =
+        Math.cos(Mpr);
+
+      const sinM =
+        Math.sin(Mr);
+
+      const sinF =
+        Math.sin(Fr);
+
+      const sinD2 =
+        Math.sin(D2);
+
+      const cosD2 =
+        Math.cos(D2);
+
+      const sinMp2 =
+        Math.sin(Mp2);
+
+      const cosMp2 =
+        Math.cos(Mp2);
+
+      const sinF2 =
+        Math.sin(F2);
+
+      const D2Mp =
+        D2 - Mpr;
+
+      const sinD2Mp =
+        Math.sin(D2Mp);
+
+      const cosD2Mp =
+        Math.cos(D2Mp);
+
+      const longitudeCorrection =
+        6.288774 * sinMp
+        + 1.274027 * sinD2Mp
+        + 0.658314 * sinD2
+        + 0.213618 * sinMp2
+        - 0.185116 * sinM
+        - 0.114332 * sinF2
+        + 0.058793
+          * Math.sin(D2 - Mp2)
+        + 0.057066
+          * Math.sin(
+            D2 - Mr - Mpr
+          )
+        + 0.053322
+          * Math.sin(D2 + Mpr)
+        + 0.045758
+          * Math.sin(D2 - Mr);
+
+      const moonLongitude =
+        (
+          LPrime
+          + longitudeCorrection
+        ) * rad;
+
+      const sinMoonLongitude =
+        Math.sin(moonLongitude);
+
+      const cosMoonLongitude =
+        Math.cos(moonLongitude);
+
+      const latitudeCorrection =
+        5.128122 * sinF
+        + 0.280602
+          * Math.sin(D2 - Fr)
+        + 0.277387
+          * Math.sin(
+            D2Mp + Fr
+          )
+        + 0.173238
+          * Math.sin(D2 + Fr)
+        + 0.055413
+          * Math.sin(Mpr + Fr)
+        + 0.046271
+          * Math.sin(Mpr - Fr);
+
+      const moonLatitude =
+        latitudeCorrection * rad;
+
+      const sinMoonLatitude =
+        Math.sin(moonLatitude);
+
+      const cosMoonLatitude =
+        Math.cos(moonLatitude);
+
+      const parallaxDegrees =
+        0.950724
+        + 0.051818 * cosMp
+        + 0.009531 * cosD2Mp
+        + 0.007843 * cosD2
+        + 0.002824 * cosMp2;
+
+      const parallaxRadians =
+        parallaxDegrees * rad;
+
+      const sinParallax =
+        Math.sin(parallaxRadians);
+
+      const obliquity =
+        (
+          23.439291
+          - 0.0130042 * T
+        ) * rad;
+
+      const sinObliquity =
+        Math.sin(obliquity);
+
+      const cosObliquity =
+        Math.cos(obliquity);
+
+      const sinDeclination =
+        sinMoonLatitude
+          * cosObliquity
+        + cosMoonLatitude
+          * sinObliquity
+          * sinMoonLongitude;
+
+      const declination =
+        Math.asin(
+          sinDeclination
+        );
+
+      const sinDeclinationFinal =
+        Math.sin(declination);
+
+      const cosDeclinationFinal =
+        Math.cos(declination);
+
+      const rightAscension =
+        Math.atan2(
+          -sinMoonLatitude
+            * sinObliquity
+          + cosMoonLatitude
+            * cosObliquity
+            * sinMoonLongitude,
+
+          cosMoonLatitude
+            * cosMoonLongitude
+        );
+
+      const gmst =
+        280.46061837
+        + 360.98564736629 * d
+        + 0.000387933 * T * T;
+
+      const localSiderealTime =
+        normalizeDegrees(
+          gmst + longitudeValue
+        ) * rad;
+
+      const hourAngle =
+        localSiderealTime
+        - rightAscension;
+
+      const sinHourAngle =
+        Math.sin(hourAngle);
+
+      const cosHourAngle =
+        Math.cos(hourAngle);
+
+      const flattening =
+        1 / 298.257223563;
+
+      const latitudeRadians =
+        latitudeValue * rad;
+
+      const sinLatitude =
+        Math.sin(latitudeRadians);
+
+      const cosLatitude =
+        Math.cos(latitudeRadians);
+
+      const u =
+        Math.atan(
+          (1 - flattening)
+          * Math.tan(
+            latitudeRadians
+          )
+        );
+
+      const sinU =
+        Math.sin(u);
+
+      const cosU =
+        Math.cos(u);
+
+      const normalizedHeight =
+        heightValue / 6378137.0;
+
+      const rhoSin =
+        (1 - flattening) * sinU
+        + normalizedHeight
+          * sinLatitude;
+
+      const rhoCos =
+        cosU
+        + normalizedHeight
+          * cosLatitude;
+
+      const rightAscensionCorrection =
+        Math.atan2(
+          -rhoCos
+            * sinParallax
+            * sinHourAngle,
+
+          cosDeclinationFinal
+            - rhoCos
+            * sinParallax
+            * cosHourAngle
+        );
+
+      const topocentricHourAngle =
+        hourAngle
+        - rightAscensionCorrection;
+
+      const topocentricDeclination =
+        Math.atan2(
+          (
+            sinDeclinationFinal
+            - rhoSin
+              * sinParallax
+          )
+          * Math.cos(
+            rightAscensionCorrection
+          ),
+
+          cosDeclinationFinal
+            - rhoCos
+              * sinParallax
+              * cosHourAngle
+        );
+
+      const sinTopocentricDeclination =
+        Math.sin(
+          topocentricDeclination
+        );
+
+      const cosTopocentricDeclination =
+        Math.cos(
+          topocentricDeclination
+        );
+
+      const sinTopocentricHourAngle =
+        Math.sin(
+          topocentricHourAngle
+        );
+
+      const cosTopocentricHourAngle =
+        Math.cos(
+          topocentricHourAngle
+        );
+
+      const sinTrueAltitude =
+        sinLatitude
+          * sinTopocentricDeclination
+        + cosLatitude
+          * cosTopocentricDeclination
+          * cosTopocentricHourAngle;
+
+      const trueAltitudeDegrees =
+        Math.asin(
+          sinTrueAltitude
+        ) * deg;
+
+      const yNavigation =
+        -sinTopocentricHourAngle
+        * cosTopocentricDeclination;
+
+      const xNavigation =
+        sinTopocentricDeclination
+          * cosLatitude
+        - cosTopocentricDeclination
+          * sinLatitude
+          * cosTopocentricHourAngle;
+
+      const azimuthDegrees =
+        normalizeDegrees(
+          Math.atan2(
+            yNavigation,
+            xNavigation
+          ) * deg
+        );
+
+      let finalAltitude =
+        trueAltitudeDegrees;
+
+      if (trueAltitudeDegrees > -1.0) {
+        const r0 =
+          1.02
+          / Math.tan(
+            (
+              trueAltitudeDegrees
+              + 10.3
+                / (
+                  trueAltitudeDegrees
+                  + 5.11
+                )
+            ) * rad
+          );
+
+        const refractionMinutes =
+          r0
+          * (
+            pressureValue
+            / 1013.25
+          )
+          * (
+            288.15
+            / (
+              273.15
+              + temperatureValue
+            )
+          );
+
+        finalAltitude +=
+          refractionMinutes / 60.0;
+      }
+
+      return {
+        altitude: finalAltitude,
+        azimuth: azimuthDegrees
+      };
+    }
+
+    let currentHeading =
+      0;
+
+    let targetHeading =
+      0;
+
+    let currentMoonAltitude =
+      0;
+
+    let currentMoonAzimuth =
+      0;
 
     function updateStaticData() {
-      const formattedLat = formatValue(lat, 'lat');
-      const formattedLon = formatValue(lon, 'lon');
-      const formattedHeight = formatValue(heightVal, 'height');
-      const formattedTemp = formatValue(tempVal, 'temp');
-      const formattedPress = formatValue(pressVal, 'press');
+      const formattedLatitude =
+        formatEnvironmentValue(
+          latitude
+        );
 
-      document.getElementById('txtGeoData').innerText = `北緯 ${formattedLat}° 東経 ${formattedLon}°`;
-      document.getElementById('txtEnvData').innerText = `高度 ${formattedHeight}m 気温 ${formattedTemp}℃ 気圧 ${formattedPress}hPa`;
+      const formattedLongitude =
+        formatEnvironmentValue(
+          longitude
+        );
+
+      const formattedHeight =
+        formatEnvironmentValue(
+          observerHeight
+        );
+
+      const formattedTemperature =
+        formatEnvironmentValue(
+          temperature
+        );
+
+      const formattedPressure =
+        pressure.toString();
+
+      geoDataElement.innerText =
+        `北緯 ${formattedLatitude}° 東経 ${formattedLongitude}°`;
+
+      environmentDataElement.innerText =
+        `高度 ${formattedHeight}m 気温 ${formattedTemperature}℃ 気圧 ${formattedPressure}hPa`;
+    }
+
+    function updateHeadingDisplay() {
+      let roundedHeading =
+        Math.round(
+          normalizeDegrees(
+            targetHeading
+          )
+        );
+
+      if (roundedHeading === 360) {
+        roundedHeading = 0;
+      }
+
+      bigHeadingElement.innerText =
+        roundedHeading.toString();
+
+      bigDirectionElement.innerText =
+        to16Direction(
+          targetHeading
+        );
     }
 
     function updateMoon() {
-      const now = new Date();
-      // Meeusアルゴリズムによる高精度計算 (大気差・高度補正含む)
-      const moonPos = calculateMoonPosition(now, lon, lat, heightVal, tempVal, pressVal);
-      
-      currentMoonAlt = moonPos.altitude;
-      currentMoonAz = moonPos.azimuth;
+      const now =
+        new Date();
 
-      moonLine.style.transform = `rotate(${currentMoonAz}deg)`;
-      moonMarker.style.transform = `rotate(${currentMoonAz}deg)`;
-      
-      const moonDirStr = to16Direction(currentMoonAz);
-      const smartAlt = formatValue(currentMoonAlt, 'moonAlt');
-      const smartAz = formatValue(currentMoonAz, 'moonAz');
-      
-      // データエリアの「月の高度」行を完全に廃止し、「月の方位」から左詰めスタート
-      document.getElementById('txtMoonAz').innerText = `月の方位: ${moonDirStr} (${smartAz}°)`;
-      
-      // 高度バーの下の数値テキストを更新
-      document.getElementById('altBarValue').innerText = `${smartAlt}°`;
-      
-      const altPercent = Math.max(0, Math.min(100, (currentMoonAlt / 90) * 100));
-      document.getElementById('altFill').style.height = altPercent + '%';
+      const moonPosition =
+        calculateMoonPosition(
+          now,
+          longitude,
+          latitude,
+          observerHeight,
+          temperature,
+          pressure
+        );
+
+      currentMoonAltitude =
+        moonPosition.altitude;
+
+      currentMoonAzimuth =
+        moonPosition.azimuth;
+
+      moonLine.style.transform =
+        `rotate(${currentMoonAzimuth}deg)`;
+
+      moonMarker.style.transform =
+        `rotate(${currentMoonAzimuth}deg)`;
+
+      if (currentMoonAltitude < 0) {
+        moonMarker.classList.add(
+          'below-horizon'
+        );
+      } else {
+        moonMarker.classList.remove(
+          'below-horizon'
+        );
+      }
+
+      const moonDirection =
+        to16Direction(
+          currentMoonAzimuth
+        );
+
+      const displayedAltitude =
+        formatMoonValue(
+          currentMoonAltitude
+        );
+
+      const displayedAzimuth =
+        formatMoonValue(
+          currentMoonAzimuth
+        );
+
+      moonAzimuthElement.innerText =
+        `月の方位: ${moonDirection} (${displayedAzimuth}°)`;
+
+      moonAltitudeValueElement.innerText =
+        `${displayedAltitude}°`;
+
+      const altitudePercentage =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            (
+              currentMoonAltitude
+              / 90
+            ) * 100
+          )
+        );
+
+      altitudeFillElement.style.height =
+        `${altitudePercentage}%`;
     }
 
-    window.addEventListener('deviceorientation', (e) => {
-      if (e.webkitCompassHeading !== undefined) {
-        targetHeading = e.webkitCompassHeading;
-        
-        document.getElementById('bigHeading').innerText = formatValue(targetHeading, 'heading');
-        document.getElementById('bigDirection').innerText = to16Direction(targetHeading);
-        updateMoon();
-      }
-    }, false);
+    function restartMoonTimer() {
+      if (moonUpdateTimer !== null) {
+        clearInterval(
+          moonUpdateTimer
+        );
 
-    // スイッチ制御
-    const swGai = document.getElementById('swGai');
-    const swSei = document.getElementById('swSei');
+        moonUpdateTimer =
+          null;
+      }
+
+      const updateInterval =
+        displayMode === 'detail'
+          ? DETAIL_UPDATE_INTERVAL_MS
+          : STANDARD_UPDATE_INTERVAL_MS;
+
+      updateMoon();
+
+      moonUpdateTimer =
+        setInterval(
+          updateMoon,
+          updateInterval
+        );
+    }
+
+    window.addEventListener(
+      'deviceorientation',
+
+      (event) => {
+        const magneticHeading =
+          event.webkitCompassHeading;
+
+        if (
+          typeof magneticHeading
+            === 'number'
+          && Number.isFinite(
+            magneticHeading
+          )
+          && magneticHeading >= 0
+        ) {
+          targetHeading =
+            magneticToTrueHeading(
+              magneticHeading
+            );
+
+          updateHeadingDisplay();
+        }
+      },
+
+      false
+    );
+
+    const standardButton =
+      document.getElementById(
+        'swGai'
+      );
+
+    const detailButton =
+      document.getElementById(
+        'swSei'
+      );
 
     function switchMode(mode) {
-      if (displayMode === mode) return;
-      displayMode = mode;
-      
-      if (mode === 'gaisuu') {
-        swGai.classList.add('active');
-        swSei.classList.remove('active');
-      } else {
-        swSei.classList.add('active');
-        swGai.classList.remove('active');
+      if (displayMode === mode) {
+        return;
       }
-      
+
+      displayMode =
+        mode;
+
+      if (mode === 'standard') {
+        standardButton.classList.add(
+          'active'
+        );
+
+        detailButton.classList.remove(
+          'active'
+        );
+      } else {
+        detailButton.classList.add(
+          'active'
+        );
+
+        standardButton.classList.remove(
+          'active'
+        );
+      }
+
       updateStaticData();
-      updateMoon();
-      document.getElementById('bigHeading').innerText = formatValue(targetHeading, 'heading');
+      updateHeadingDisplay();
+      restartMoonTimer();
     }
 
-    swGai.onclick = () => switchMode('gaisuu');
-    swSei.onclick = () => switchMode('seimitsu');
+    standardButton.onclick =
+      () => {
+        switchMode('standard');
+      };
+
+    detailButton.onclick =
+      () => {
+        switchMode('detail');
+      };
 
     function renderLoop() {
-      let diff = targetHeading - currentHeading;
-      while (diff < -180) diff += 360;
-      while (diff > 180) diff -= 360;
-      currentHeading += diff * 0.15;
+      let difference =
+        targetHeading
+        - currentHeading;
 
-      rose.style.transform = `rotate(${-currentHeading}deg)`;
-      requestAnimationFrame(renderLoop);
+      while (difference < -180) {
+        difference += 360;
+      }
+
+      while (difference > 180) {
+        difference -= 360;
+      }
+
+      currentHeading +=
+        difference * 0.15;
+
+      rose.style.transform =
+        `rotate(${-currentHeading}deg)`;
+
+      requestAnimationFrame(
+        renderLoop
+      );
     }
-    requestAnimationFrame(renderLoop);
+
+    requestAnimationFrame(
+      renderLoop
+    );
+
+    startButton.onclick =
+      async () => {
+        if (
+          typeof DeviceOrientationEvent
+            !== 'undefined'
+          && typeof DeviceOrientationEvent
+            .requestPermission
+            === 'function'
+        ) {
+          try {
+            const permission =
+              await DeviceOrientationEvent
+                .requestPermission();
+
+            if (
+              permission === 'granted'
+            ) {
+              startOverlay.style.display =
+                'none';
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        } else {
+          startOverlay.style.display =
+            'none';
+        }
+      };
 
     updateStaticData();
-    
-    document.getElementById('startBtn').onclick = () => {
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission().then(res => {
-          if (res === 'granted') document.getElementById('overlay').style.display = 'none';
-        });
-      } else {
-        document.getElementById('overlay').style.display = 'none';
-      }
-    };
+    updateHeadingDisplay();
+    restartMoonTimer();
   </script>
 </body>
 </html>
