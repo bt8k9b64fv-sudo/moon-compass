@@ -12,7 +12,7 @@
     content="black-translucent"
   >
   <title>MOON COMPASS</title>
-  manifest.json
+  <link rel="manifest" href="manifest.json">
 
   <style>
     :root {
@@ -106,7 +106,7 @@
       position: absolute;
       width: 1px;
       height: 16px;
-      background: #444;
+      background: #444444;
       left: 50%;
       top: 0;
       transform-origin: 0 140px;
@@ -114,11 +114,11 @@
 
     .tick.major {
       width: 2px;
-      background: #bbb;
+      background: #bbbbbb;
     }
 
     .tick.medium {
-      background: #777;
+      background: #777777;
     }
 
     .tick.north {
@@ -207,7 +207,7 @@
 
     .alt-bar-fill {
       width: 100%;
-      height: 0%;
+      height: 0;
       background: var(--moon-color);
       border-radius: 2px;
       box-shadow: 0 0 8px rgba(249, 215, 28, 0.4);
@@ -231,16 +231,18 @@
       justify-content: center;
     }
 
-    .heading-value {
+    .heading-value,
+    .heading-unit {
       font-size: 76px;
       font-weight: 200;
+    }
+
+    .heading-value {
       letter-spacing: -2px;
       font-variant-numeric: tabular-nums;
     }
 
     .heading-unit {
-      font-size: 76px;
-      font-weight: 200;
       margin-left: -2px;
     }
 
@@ -252,7 +254,6 @@
 
     .mode-switch {
       display: flex;
-      flex-direction: row;
       background: #1c1c1e;
       border-radius: 8px;
       padding: 2px;
@@ -319,7 +320,7 @@
     .btn {
       background: #ffffff;
       color: #000000;
-      border: none;
+      border: 0;
       padding: 16px 32px;
       border-radius: 30px;
       font-size: 16px;
@@ -371,12 +372,8 @@
   </div>
 
   <div class="data-text-area">
-    <div class="data-line" id="txtMoonAz">
-      月の方位: -
-    </div>
-    <div class="data-line" id="txtGeoData">
-      北緯 - 東経 -
-    </div>
+    <div class="data-line" id="txtMoonAz">月の方位: -</div>
+    <div class="data-line" id="txtGeoData">北緯 - 東経 -</div>
     <div class="data-line data-line-sub" id="txtEnvData">
       高度 - ／ 気温 - ／ 気圧 -
     </div>
@@ -494,7 +491,7 @@
     moonMarker.className =
       'moon-marker';
 
-    moonMarker.innerHTML =
+    moonMarker.textContent =
       '🌕';
 
     rose.appendChild(moonMarker);
@@ -521,11 +518,9 @@
       const parsedValue =
         Number(rawValue);
 
-      if (Number.isFinite(parsedValue)) {
-        return parsedValue;
-      }
-
-      return defaultValue;
+      return Number.isFinite(parsedValue)
+        ? parsedValue
+        : defaultValue;
     }
 
     const latitude =
@@ -606,15 +601,11 @@
         '北北西'
       ];
 
-      const normalized =
-        normalizeDegrees(degrees);
-
-      const index =
+      return names[
         Math.round(
-          normalized / 22.5
-        ) % 16;
-
-      return names[index];
+          normalizeDegrees(degrees) / 22.5
+        ) % 16
+      ];
     }
 
     function formatMoonValue(value) {
@@ -642,10 +633,10 @@
       longitudeValue
     ) {
       const deltaLatitude =
-        latitudeValue - 37.0;
+        latitudeValue - 37;
 
       const deltaLongitude =
-        longitudeValue - 138.0;
+        longitudeValue - 138;
 
       const declinationMinutes =
         (8 * 60 + 15.822)
@@ -661,7 +652,7 @@
           * deltaLongitude
           * deltaLongitude;
 
-      return declinationMinutes / 60.0;
+      return declinationMinutes / 60;
     }
 
     const westDeclination =
@@ -694,23 +685,18 @@
         180 / Math.PI;
 
       const jd =
-        (
-          dateObject.getTime()
-          / 86400000
-        )
+        dateObject.getTime()
+        / 86400000
         + 2440587.5;
 
       const d =
-        jd - 2451545.0;
+        jd - 2451545;
 
       const T =
         d / 36525;
 
-      const deltaTDays =
-        69.2 / 86400;
-
       const dTt =
-        d + deltaTDays;
+        d + 69.2 / 86400;
 
       const LPrime =
         (
@@ -738,7 +724,7 @@
 
       const F =
         (
-          93.2720950
+          93.272095
           + 13.22935026 * dTt
         ) % 360;
 
@@ -853,15 +839,14 @@
       const cosMoonLatitude =
         Math.cos(moonLatitude);
 
-      const parallaxDegrees =
-        0.950724
-        + 0.051818 * cosMp
-        + 0.009531 * cosD2Mp
-        + 0.007843 * cosD2
-        + 0.002824 * cosMp2;
-
       const parallaxRadians =
-        parallaxDegrees * rad;
+        (
+          0.950724
+          + 0.051818 * cosMp
+          + 0.009531 * cosD2Mp
+          + 0.007843 * cosD2
+          + 0.002824 * cosMp2
+        ) * rad;
 
       const sinParallax =
         Math.sin(parallaxRadians);
@@ -885,14 +870,11 @@
           * sinObliquity
           * sinMoonLongitude;
 
-      const clampedSinDeclination =
-        clampUnit(
-          sinDeclination
-        );
-
       const declination =
         Math.asin(
-          clampedSinDeclination
+          clampUnit(
+            sinDeclination
+          )
         );
 
       const sinDeclinationFinal =
@@ -960,7 +942,7 @@
         Math.cos(u);
 
       const normalizedHeight =
-        heightValue / 6378137.0;
+        heightValue / 6378137;
 
       const rhoSin =
         (1 - flattening) * sinU
@@ -980,8 +962,8 @@
 
           cosDeclinationFinal
             - rhoCos
-            * sinParallax
-            * cosHourAngle
+              * sinParallax
+              * cosHourAngle
         );
 
       const topocentricHourAngle =
@@ -1032,14 +1014,11 @@
           * cosTopocentricDeclination
           * cosTopocentricHourAngle;
 
-      const clampedSinTrueAltitude =
-        clampUnit(
-          sinTrueAltitude
-        );
-
       const trueAltitudeDegrees =
         Math.asin(
-          clampedSinTrueAltitude
+          clampUnit(
+            sinTrueAltitude
+          )
         ) * deg;
 
       const yNavigation =
@@ -1064,7 +1043,7 @@
       let finalAltitude =
         trueAltitudeDegrees;
 
-      if (trueAltitudeDegrees > -1.0) {
+      if (trueAltitudeDegrees > -1) {
         const r0 =
           1.02
           / Math.tan(
@@ -1093,7 +1072,7 @@
           );
 
         finalAltitude +=
-          refractionMinutes / 60.0;
+          refractionMinutes / 60;
       }
 
       return {
@@ -1115,34 +1094,11 @@
       0;
 
     function updateStaticData() {
-      const formattedLatitude =
-        formatEnvironmentValue(
-          latitude
-        );
-
-      const formattedLongitude =
-        formatEnvironmentValue(
-          longitude
-        );
-
-      const formattedHeight =
-        formatEnvironmentValue(
-          observerHeight
-        );
-
-      const formattedTemperature =
-        formatEnvironmentValue(
-          temperature
-        );
-
-      const formattedPressure =
-        pressure.toString();
-
       geoDataElement.innerText =
-        `北緯 ${formattedLatitude}° 東経 ${formattedLongitude}°`;
+        `北緯 ${formatEnvironmentValue(latitude)}° 東経 ${formatEnvironmentValue(longitude)}°`;
 
       environmentDataElement.innerText =
-        `高度 ${formattedHeight}m 気温 ${formattedTemperature}℃ 気圧 ${formattedPressure}hPa`;
+        `高度 ${formatEnvironmentValue(observerHeight)}m 気温 ${formatEnvironmentValue(temperature)}℃ 気圧 ${pressure}hPa`;
     }
 
     function updateHeadingDisplay() {
@@ -1167,12 +1123,9 @@
     }
 
     function updateMoon() {
-      const now =
-        new Date();
-
       const moonPosition =
         calculateMoonPosition(
-          now,
+          new Date(),
           longitude,
           latitude,
           observerHeight,
@@ -1192,46 +1145,25 @@
       moonMarker.style.transform =
         `rotate(${currentMoonAzimuth}deg)`;
 
-      if (currentMoonAltitude < 0) {
-        moonMarker.classList.add(
-          'below-horizon'
-        );
-      } else {
-        moonMarker.classList.remove(
-          'below-horizon'
-        );
-      }
-
-      const moonDirection =
-        to16Direction(
-          currentMoonAzimuth
-        );
-
-      const displayedAltitude =
-        formatMoonValue(
-          currentMoonAltitude
-        );
-
-      const displayedAzimuth =
-        formatMoonValue(
-          currentMoonAzimuth
-        );
+      moonMarker.classList.toggle(
+        'below-horizon',
+        currentMoonAltitude < 0
+      );
 
       moonAzimuthElement.innerText =
-        `月の方位: ${moonDirection} (${displayedAzimuth}°)`;
+        `月の方位: ${to16Direction(currentMoonAzimuth)} (${formatMoonValue(currentMoonAzimuth)}°)`;
 
       moonAltitudeValueElement.innerText =
-        `${displayedAltitude}°`;
+        `${formatMoonValue(currentMoonAltitude)}°`;
 
       const altitudePercentage =
         Math.max(
           0,
           Math.min(
             100,
-            (
-              currentMoonAltitude
-              / 90
-            ) * 100
+            currentMoonAltitude
+            / 90
+            * 100
           )
         );
 
@@ -1244,17 +1176,14 @@
         clearInterval(
           moonUpdateTimer
         );
-
-        moonUpdateTimer =
-          null;
       }
+
+      updateMoon();
 
       const updateInterval =
         displayMode === 'detail'
           ? DETAIL_UPDATE_INTERVAL_MS
           : STANDARD_UPDATE_INTERVAL_MS;
-
-      updateMoon();
 
       moonUpdateTimer =
         setInterval(
@@ -1289,14 +1218,10 @@
     );
 
     const standardButton =
-      document.getElementById(
-        'swGai'
-      );
+      document.getElementById('swGai');
 
     const detailButton =
-      document.getElementById(
-        'swSei'
-      );
+      document.getElementById('swSei');
 
     function switchMode(mode) {
       if (displayMode === mode) {
@@ -1306,23 +1231,15 @@
       displayMode =
         mode;
 
-      if (mode === 'standard') {
-        standardButton.classList.add(
-          'active'
-        );
+      standardButton.classList.toggle(
+        'active',
+        mode === 'standard'
+      );
 
-        detailButton.classList.remove(
-          'active'
-        );
-      } else {
-        detailButton.classList.add(
-          'active'
-        );
-
-        standardButton.classList.remove(
-          'active'
-        );
-      }
+      detailButton.classList.toggle(
+        'active',
+        mode === 'detail'
+      );
 
       updateStaticData();
       updateHeadingDisplay();
@@ -1330,14 +1247,10 @@
     }
 
     standardButton.onclick =
-      () => {
-        switchMode('standard');
-      };
+      () => switchMode('standard');
 
     detailButton.onclick =
-      () => {
-        switchMode('detail');
-      };
+      () => switchMode('detail');
 
     function renderLoop() {
       let difference =
@@ -1370,20 +1283,15 @@
     startButton.onclick =
       async () => {
         if (
-          typeof DeviceOrientationEvent
-            !== 'undefined'
-          && typeof DeviceOrientationEvent
-            .requestPermission
+          typeof DeviceOrientationEvent !== 'undefined'
+          && typeof DeviceOrientationEvent.requestPermission
             === 'function'
         ) {
           try {
             const permission =
-              await DeviceOrientationEvent
-                .requestPermission();
+              await DeviceOrientationEvent.requestPermission();
 
-            if (
-              permission === 'granted'
-            ) {
+            if (permission === 'granted') {
               startOverlay.style.display =
                 'none';
             }
