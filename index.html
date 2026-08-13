@@ -13,7 +13,6 @@
   >
 
   <title>MOON COMPASS</title>
-
   manifest.json
 
   <style>
@@ -1029,9 +1028,18 @@
           * cosTopocentricDeclination
           * cosTopocentricHourAngle;
 
+      const clampedSinTrueAltitude =
+        Math.max(
+          -1,
+          Math.min(
+            1,
+            sinTrueAltitude
+          )
+        );
+
       const trueAltitudeDegrees =
         Math.asin(
-          sinTrueAltitude
+          clampedSinTrueAltitude
         ) * deg;
 
       const yNavigation =
@@ -1257,7 +1265,6 @@
 
     window.addEventListener(
       'deviceorientation',
-
       (event) => {
         const magneticHeading =
           event.webkitCompassHeading;
@@ -1278,7 +1285,6 @@
           updateHeadingDisplay();
         }
       },
-
       false
     );
 
