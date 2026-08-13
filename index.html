@@ -11,7 +11,6 @@
     name="apple-mobile-web-app-status-bar-style"
     content="black-translucent"
   >
-
   <title>MOON COMPASS</title>
   manifest.json
 
@@ -356,10 +355,7 @@
       <div class="altitude-meter">
         <div class="alt-bar-fill" id="altFill"></div>
       </div>
-
-      <div class="alt-live-value" id="altBarValue">
-        -°
-      </div>
+      <div class="alt-live-value" id="altBarValue">-°</div>
     </div>
   </div>
 
@@ -370,24 +366,17 @@
   </div>
 
   <div class="mode-switch">
-    <div id="swGai" class="sw-btn active">
-      標準
-    </div>
-
-    <div id="swSei" class="sw-btn">
-      詳細
-    </div>
+    <div id="swGai" class="sw-btn active">標準</div>
+    <div id="swSei" class="sw-btn">詳細</div>
   </div>
 
   <div class="data-text-area">
     <div class="data-line" id="txtMoonAz">
       月の方位: -
     </div>
-
     <div class="data-line" id="txtGeoData">
       北緯 - 東経 -
     </div>
-
     <div class="data-line data-line-sub" id="txtEnvData">
       高度 - ／ 気温 - ／ 気圧 -
     </div>
@@ -585,6 +574,16 @@
       return (
         (value % 360) + 360
       ) % 360;
+    }
+
+    function clampUnit(value) {
+      return Math.max(
+        -1,
+        Math.min(
+          1,
+          value
+        )
+      );
     }
 
     function to16Direction(degrees) {
@@ -886,9 +885,14 @@
           * sinObliquity
           * sinMoonLongitude;
 
+      const clampedSinDeclination =
+        clampUnit(
+          sinDeclination
+        );
+
       const declination =
         Math.asin(
-          sinDeclination
+          clampedSinDeclination
         );
 
       const sinDeclinationFinal =
@@ -1029,12 +1033,8 @@
           * cosTopocentricHourAngle;
 
       const clampedSinTrueAltitude =
-        Math.max(
-          -1,
-          Math.min(
-            1,
-            sinTrueAltitude
-          )
+        clampUnit(
+          sinTrueAltitude
         );
 
       const trueAltitudeDegrees =
